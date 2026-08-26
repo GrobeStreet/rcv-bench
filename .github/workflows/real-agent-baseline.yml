@@ -1,0 +1,97 @@
+name: Real agent baseline (zero API cost)
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: Ollama model
+        required: false
+        default: qwen2.5-coder:1.5b
+      tasks:
+        description: Optional space-separated claim IDs; blank runs all 14
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  local-agent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    env:
+      RCV_LOCAL_MODEL: ${{ inputs.model || 'qwen2.5-coder:1.5b' }}
+      RCV_AGENT_MAX_STEPS: "8"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Ollama
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sh
+          ollama serve > /tmp/ollama.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:11434/api/tags >/dev/null && break
+            sleep 2
+          done
+
+      - name: Pull open-weight model
+        run: ollama pull "$RCV_LOCAL_MODEL"
+
+      - name: Record execution policy
+        run: |
+          mkdir -p results/qwen25-coder-15b-local
+          cat > results/qwen25-coder-15b-local/run_policy.json <<EOF
+          {
+            "agent": "harness/local_ollama_agent.py",
+            "model": "$RCV_LOCAL_MODEL",
+            "provider_api": "none",
+            "personal_spend_usd": 0,
+            "runner": "github-hosted ubuntu-latest public-repo",
+            "agent_network": "blocked by tool policy; setup may clone declared pinned sources",
+            "agent_tools": ["list_files", "read_file", "bounded_local_shell"],
+            "max_agent_steps_per_task": 8,
+            "per_task_harness_timeout_seconds": 1200,
+            "gold_visibility": "withheld from sanitized task workspace"
+          }
+          EOF
+
+      - name: Run real autonomous agent
+        shell: bash
+        run: |
+          EXTRA=()
+          if [ -n "${{ inputs.tasks }}" ]; then
+            read -ra IDS <<< "${{ inputs.tasks }}"
+            EXTRA+=(--include "${IDS[@]}")
+          fi
+          python harness/run.py \
+            --command "python3 $GITHUB_WORKSPACE/harness/local_ollama_agent.py" \
+            --stage-source \
+            --timeout 1200 \
+            --out results/qwen25-coder-15b-local/predictions.json \
+            --trace results/qwen25-coder-15b-local/trace.jsonl \
+            "${EXTRA[@]}"
+
+      - name: Score complete 14-task run
+        if: ${{ inputs.tasks == '' }}
+        run: |
+          python scoring/score.py results/qwen25-coder-15b-local/predictions.json \
+            > results/qwen25-coder-15b-local/score.txt
+          cat results/qwen25-coder-15b-local/score.txt
+
+      - name: Freeze provenance
+        if: always()
+        run: |
+          git rev-parse HEAD > results/qwen25-coder-15b-local/benchmark_commit.txt
+          ollama list > results/qwen25-coder-15b-local/ollama_models.txt || true
+          cp /tmp/ollama.log results/qwen25-coder-15b-local/ollama.log || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rcv-real-agent-qwen25-coder-15b
+          path: results/qwen25-coder-15b-local/
+          retention-days: 90
