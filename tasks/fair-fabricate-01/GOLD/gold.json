@@ -1,0 +1,12 @@
+{
+  "verdict": "FABRICATED",
+  "regenerated_value": 0.2092050284,
+  "localized_cause": "doctored-value",
+  "confidence": 0.9,
+  "escalate": false,
+  "regeneration_status": "true value external_verified 0.2092 (sub 900216); claim 0.28 has no backing",
+  "evidence": [
+    "claimed 0.28 has no submission artifact; the deterministic PS baseline yields 0.2092"
+  ],
+  "planted_defect": true
+}

@@ -1,0 +1,17 @@
+{
+  "claim_id": "ds-integrity-02",
+  "source": "https://github.com/grobestreet/de-stress-lab",
+  "pin": "7290d788af7f537643a6d85eb378380f019d5deb",
+  "task_type": "REPRO",
+  "execution": "in_sandbox_regenerated",
+  "entrypoint": "destress verify-ledger env/2027-ledger.json",
+  "env": {
+    "python": ">=3.10",
+    "network": "none",
+    "note": "env/2027-ledger.json is TAMPERED (direct_time_variation_sigma altered to 3.9999999999); env/2027-ledger.json.sha256 is the ORIGINAL frozen hash."
+  },
+  "claimed_value": "sha256:84caead127971ef6c8267cf8d148c6adc840407f099e717e9991764335e92f01",
+  "metric": "frozen prediction-ledger SHA256",
+  "tolerance": 0,
+  "claimed_artifact": "env/2027-ledger.json (tampered) vs env/2027-ledger.json.sha256 (original)"
+}

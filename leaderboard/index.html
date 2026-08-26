@@ -1,0 +1,65 @@
+<title>RCV-Bench Leaderboard</title>
+<style>
+:root{--bg:#f7f8fa;--card:#fff;--ink:#1a2233;--mut:#5a6478;--line:#e3e7ee;--accent:#3a7bd5}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1420;--card:#161d2b;--ink:#e7ecf5;--mut:#9aa6bd;--line:#26304a;--accent:#5b9bff}}
+:root[data-theme=dark]{--bg:#0f1420;--card:#161d2b;--ink:#e7ecf5;--mut:#9aa6bd;--line:#26304a;--accent:#5b9bff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:2.2rem 1.1rem}
+.wrap{max-width:940px;margin:0 auto}
+h1{font-size:1.7rem;margin:0 0 .2rem}
+.sub{color:var(--mut);margin:0 0 1.6rem;max-width:60ch}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1.2rem 1.3rem;margin:1rem 0}
+h2{font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:.1rem 0 1rem}
+.sysrow{display:grid;grid-template-columns:180px 1fr 92px;align-items:center;gap:.7rem;margin:.55rem 0}
+.sysname{font-weight:600;font-size:.92rem}
+.track{background:var(--line);border-radius:99px;height:16px;overflow:hidden}
+.fill{height:100%;border-radius:99px}
+.pct{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.frac{color:var(--mut);font-weight:400;font-size:.82rem}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:left;padding:.45rem .5rem;border-bottom:1px solid var(--line)}
+th{font-size:.74rem;letter-spacing:.05em;text-transform:uppercase;color:var(--mut)}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.83rem}
+.src{color:var(--mut)}
+.exe{font-size:.8rem;color:var(--mut)}
+.chip{color:#fff;font-size:.7rem;font-weight:700;padding:.1rem .45rem;border-radius:5px;letter-spacing:.02em}
+.tag{font-size:.65rem;color:var(--mut);border:1px solid var(--line);border-radius:4px;padding:0 .3rem}
+.ok{text-align:center;font-weight:700}.ok.y{color:#2e9e6b}.ok.n{color:#d0555a}
+.note{color:var(--mut);font-size:.84rem;margin:.3rem 0 0}
+.scroll{overflow-x:auto}
+a{color:var(--accent)}
+</style>
+<div class="wrap">
+<h1>RCV-Bench <span style="color:var(--mut);font-weight:400;font-size:1rem">· Research-Claim Verification (v0)</span></h1>
+<p class="sub">Can an agent tell whether a claimed research result is real — regenerate it, catch a planted or real defect, and judge robustness? 14 instances from 4 real public repos. Gold regenerated in-sandbox (11) or externally verified (3).</p>
+
+<div class="card">
+<h2>Verdict accuracy — headroom</h2>
+<div class="sysrow"><div class="sysname">perfect agent (ceiling)</div>
+        <div class="track"><div class="fill" style="width:100.0%;background:#3a7bd5"></div></div><div class="pct">100%<span class="frac"> 14/14</span></div></div><div class="sysrow"><div class="sysname">naive-rerun</div>
+        <div class="track"><div class="fill" style="width:64.3%;background:#2e7d5b"></div></div><div class="pct">64%<span class="frac"> 9/14</span></div></div><div class="sysrow"><div class="sysname">always-REPRODUCED</div>
+        <div class="track"><div class="fill" style="width:35.7%;background:#b5820a"></div></div><div class="pct">36%<span class="frac"> 5/14</span></div></div>
+<p class="note">Re-running catches wrong numbers, so <b>naive-rerun</b> clears every REPRODUCED &amp; DEVIATION — but it is blind to fragility and fabrication. The gap to the ceiling is the benchmark's reason to exist.</p>
+</div>
+
+<div class="card">
+<h2>Scored metrics</h2>
+<div class="scroll"><table>
+<tr><th>system</th><th style="text-align:right">verdict acc</th><th style="text-align:right">macro-F1</th><th style="text-align:right">FRAGILE recall</th><th style="text-align:right">FABRICATED recall</th></tr>
+<tr><td>perfect agent (ceiling)</td><td class='num'>1.000</td><td class='num'>1.000</td><td class='num'>100%</td><td class='num'>100%</td></tr><tr><td>naive-rerun</td><td class='num'>0.643</td><td class='num'>0.392</td><td class='num'>0%</td><td class='num'>0%</td></tr><tr><td>always-REPRODUCED</td><td class='num'>0.357</td><td class='num'>0.132</td><td class='num'>0%</td><td class='num'>0%</td></tr>
+</table></div>
+<p class="note">FRAGILE &amp; FABRICATED recall are the headroom classes: both baselines score 0. Scorer: <span class="mono">scoring/score.py</span>.</p>
+</div>
+
+<div class="card">
+<h2>Instances (gold verdicts)</h2>
+<div class="scroll"><table>
+<tr><th>id</th><th>source</th><th>type</th><th>gold</th><th>exec</th><th>always✓</th><th>naive✓</th></tr>
+<tr><td class='mono'>ds-repro-01</td><td class='mono src'>de-stress-lab</td><td>REPRO</td><td><span class="chip" style="background:#2e7d5b">REPRODUCED</span></td><td class='exe'>sandbox</td><td class='ok y'>✓</td><td class='ok y'>✓</td></tr><tr><td class='mono'>ds-integrity-01</td><td class='mono src'>de-stress-lab</td><td>REPRO</td><td><span class="chip" style="background:#2e7d5b">REPRODUCED</span></td><td class='exe'>sandbox</td><td class='ok y'>✓</td><td class='ok y'>✓</td></tr><tr><td class='mono'>ds-integrity-02 <span class="tag">planted</span></td><td class='mono src'>de-stress-lab</td><td>REPRO</td><td><span class="chip" style="background:#b5820a">DEVIATION</span></td><td class='exe'>sandbox</td><td class='ok n'>✗</td><td class='ok y'>✓</td></tr><tr><td class='mono'>ds-audit-01</td><td class='mono src'>de-stress-lab</td><td>REPRO</td><td><span class="chip" style="background:#2e7d5b">REPRODUCED</span></td><td class='exe'>sandbox</td><td class='ok y'>✓</td><td class='ok y'>✓</td></tr><tr><td class='mono'>ds-fragile-01</td><td class='mono src'>de-stress-lab</td><td>ROBUST</td><td><span class="chip" style="background:#8a4fbf">FRAGILE</span></td><td class='exe'>sandbox</td><td class='ok n'>✗</td><td class='ok n'>✗</td></tr><tr><td class='mono'>ds-fabricate-01 <span class="tag">planted</span></td><td class='mono src'>de-stress-lab</td><td>REPRO</td><td><span class="chip" style="background:#b23b3b">FABRICATED</span></td><td class='exe'>sandbox</td><td class='ok n'>✗</td><td class='ok n'>✗</td></tr><tr><td class='mono'>fair-repro-01</td><td class='mono src'>robert-morong-research</td><td>REPRO</td><td><span class="chip" style="background:#2e7d5b">REPRODUCED</span></td><td class='exe'>external</td><td class='ok y'>✓</td><td class='ok y'>✓</td></tr><tr><td class='mono'>fair-deviation-01 <span class="tag">planted</span></td><td class='mono src'>robert-morong-research</td><td>REPRO</td><td><span class="chip" style="background:#b5820a">DEVIATION</span></td><td class='exe'>external</td><td class='ok n'>✗</td><td class='ok y'>✓</td></tr><tr><td class='mono'>fair-fabricate-01 <span class="tag">planted</span></td><td class='mono src'>robert-morong-research</td><td>REPRO</td><td><span class="chip" style="background:#b23b3b">FABRICATED</span></td><td class='exe'>external</td><td class='ok n'>✗</td><td class='ok n'>✗</td></tr><tr><td class='mono'>arc-repro-01</td><td class='mono src'>arc-agi-2-occam-baseline</td><td>REPRO</td><td><span class="chip" style="background:#2e7d5b">REPRODUCED</span></td><td class='exe'>sandbox</td><td class='ok y'>✓</td><td class='ok y'>✓</td></tr><tr><td class='mono'>arc-selfcorrect-01</td><td class='mono src'>arc-agi-2-occam-baseline</td><td>REPRO</td><td><span class="chip" style="background:#b5820a">DEVIATION</span></td><td class='exe'>sandbox</td><td class='ok n'>✗</td><td class='ok y'>✓</td></tr><tr><td class='mono'>arc-leaderboard-01</td><td class='mono src'>arc-agi-2-occam-baseline</td><td>ROBUST</td><td><span class="chip" style="background:#8a4fbf">FRAGILE</span></td><td class='exe'>sandbox</td><td class='ok n'>✗</td><td class='ok n'>✗</td></tr><tr><td class='mono'>mmlu-flip-01</td><td class='mono src'>mmlu-robustness-audit</td><td>ROBUST</td><td><span class="chip" style="background:#8a4fbf">FRAGILE</span></td><td class='exe'>sandbox</td><td class='ok n'>✗</td><td class='ok n'>✗</td></tr><tr><td class='mono'>mmlu-calib-deviation-01</td><td class='mono src'>mmlu-robustness-audit</td><td>REPRO</td><td><span class="chip" style="background:#b5820a">DEVIATION</span></td><td class='exe'>sandbox</td><td class='ok n'>✗</td><td class='ok y'>✓</td></tr>
+</table></div>
+<p class="note">planted = a defect we introduced; the rest are real reproductions, real bugs, or the repos' own documented self-corrections. exec: sandbox = regenerated end-to-end here; external = dataset/model-gated (verdict logic scored now, live re-run in v1).</p>
+</div>
+
+<p class="note">Benchmark code Apache-2.0 · task data CC BY 4.0 · built by the GrobeStreet research crew · <a href="https://github.com/GrobeStreet/rcv-bench">source on GitHub</a> · aligned to the <a href="https://benchmarks.snorkel.ai/">Snorkel Open Benchmarks</a> output-complexity axis.</p>
+</div>

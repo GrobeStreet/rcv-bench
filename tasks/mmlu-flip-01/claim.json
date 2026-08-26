@@ -1,0 +1,28 @@
+{
+  "claim_id": "mmlu-flip-01",
+  "source": "https://github.com/grobestreet/mmlu-robustness-audit",
+  "pin": "25bf51f555d388c5ddb823c0c513670b9fe45332",
+  "task_type": "ROBUST",
+  "execution": "in_sandbox_regenerated",
+  "entrypoint": "PYTHONPATH=<mmlu-repo> python3 harness/mmlu_live.py --n 300 --dtype float32 --batch-size 16  (batched reproduction of audit_full.py; Qwen2.5-0.5B-Instruct rev 7ae5576, cais/mmlu rev c30699e, seed 0). Regenerated in-sandbox 2026-08-26; metrics match the repo's fp32 column exactly.",
+  "env": {
+    "model": "Qwen/Qwen2.5-0.5B-Instruct@7ae5576",
+    "dataset": "cais/mmlu@c30699e",
+    "dtype": "float32",
+    "n_questions": 300,
+    "seed": 0,
+    "network": "hf-download"
+  },
+  "claimed_value": {
+    "headline_accuracy": "~43-44%"
+  },
+  "metric": "MMLU multiple-choice accuracy under fixed vs cyclically-reordered answer options",
+  "tolerance": {
+    "accuracy_pp": 1.5
+  },
+  "perturbation": {
+    "kind": "cyclic-option-reorder",
+    "rotations": 4
+  },
+  "claimed_artifact": "audit_full.py / mmlu_live.py output parquet"
+}

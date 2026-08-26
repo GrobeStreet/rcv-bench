@@ -1,0 +1,20 @@
+{
+  "claim_id": "ds-repro-01",
+  "source": "https://github.com/grobestreet/de-stress-lab",
+  "pin": "7290d788af7f537643a6d85eb378380f019d5deb",
+  "task_type": "REPRO",
+  "execution": "in_sandbox_regenerated",
+  "entrypoint": "pip install -e . && destress demo",
+  "env": {
+    "python": ">=3.10",
+    "deps": [
+      "numpy>=1.26",
+      "scipy>=1.11"
+    ],
+    "network": "none"
+  },
+  "claimed_value": 10.554718768447175,
+  "metric": "bundled DESI DR2 BAO LCDM chi2 (destress demo -> bao_chi2)",
+  "tolerance": 1e-09,
+  "claimed_artifact": "destress demo JSON, field bao_chi2"
+}

@@ -1,0 +1,12 @@
+{
+  "verdict": "FABRICATED",
+  "regenerated_value": 10.554718768447175,
+  "localized_cause": "unsupported-claim/doctored-value",
+  "confidence": 0.95,
+  "escalate": false,
+  "regeneration_status": "regenerated_in_sandbox_2026-08-25",
+  "evidence": [
+    "`destress demo` fits flat LCDM with bao_chi2=10.5547 and reports NO detection statistic; the '5-sigma evolving-DE' claim has no backing artifact and no regenerable path."
+  ],
+  "planted_defect": true
+}

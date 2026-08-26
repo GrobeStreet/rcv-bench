@@ -1,0 +1,19 @@
+{
+  "verdict": "DEVIATION",
+  "regenerated_value": {
+    "ECE_10bin": "0.1367",
+    "stable_across_rotations": "21.67%",
+    "accuracy_on_stable": "75.38%",
+    "mean_confidence": "56.76%"
+  },
+  "localized_cause": "calibration-metric-nonreproduction (frozen calibration/stability values did not regenerate)",
+  "confidence": 0.92,
+  "escalate": false,
+  "regeneration_status": "regenerated_in_sandbox_2026-08-26 (n=300, seed 0, fp32); confirms the repo's own 'not regenerated' verdict",
+  "evidence": [
+    "frozen ECE 0.28 -> regenerated in-sandbox 0.1367",
+    "frozen stable-across-rotations 35.7% -> 21.67%; accuracy-on-stable 56.1% -> 75.38%; mean-confidence 69.1% -> 56.76%",
+    "repo RESULTS.md flags these as NOT regenerated; our independent in-sandbox run reproduces the regenerated (not the frozen) values"
+  ],
+  "planted_defect": false
+}

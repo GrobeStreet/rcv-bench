@@ -1,0 +1,19 @@
+{
+  "_doc": "PUBLIC headline recomputations a naive re-run of each entrypoint produces, vs the claim. These are observable facts (regenerated numbers / documented receipts), NOT the gold verdict. The naive-rerun baseline is allowed to use these; it still must DERIVE a verdict. 'matches_claim' = does the recomputed HEADLINE number equal the claim within tolerance (no perturbation, no fabrication reasoning).",
+  "observations": {
+    "ds-repro-01":            {"matches_claim": true,  "note": "destress demo bao_chi2 10.5547 == claim"},
+    "ds-integrity-01":        {"matches_claim": true,  "note": "verify-ledger passes"},
+    "ds-integrity-02":        {"matches_claim": false, "note": "verify-ledger recompute cb26105f != frozen 84caead1"},
+    "ds-audit-01":            {"matches_claim": true,  "note": "audit-repo 100/100 == claim"},
+    "ds-fragile-01":          {"matches_claim": true,  "note": "full-data observed T 7.8506 == claim (naive never deletes LRG2)"},
+    "ds-fabricate-01":        {"matches_claim": false, "note": "demo yields LCDM 10.5547; prose 5-sigma claim unmatched"},
+    "arc-repro-01":           {"matches_claim": true,  "note": "candidate-reliability 32.8/50.8/63.4 == frozen"},
+    "arc-selfcorrect-01":     {"matches_claim": false, "note": "same-holdout 32.8/50.8/63.4 != old prefix 50/87/95"},
+    "arc-leaderboard-01":     {"matches_claim": true,  "note": "point ranking 54>45 (naive reads as real gap; no power test)"},
+    "fair-repro-01":          {"matches_claim": true,  "note": "PS baseline 0.2092 == claim (receipt)"},
+    "fair-deviation-01":      {"matches_claim": false, "note": "sign-inverted code yields 0.00457 != claim 0.21"},
+    "fair-fabricate-01":      {"matches_claim": false, "note": "true 0.2092 != claim 0.28"},
+    "mmlu-flip-01":           {"matches_claim": true,  "note": "headline accuracy ~44% == claim (naive never reorders options)"},
+    "mmlu-calib-deviation-01":{"matches_claim": false, "note": "regenerated ECE 0.132 != frozen 0.28"}
+  }
+}

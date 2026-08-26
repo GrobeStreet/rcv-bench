@@ -1,0 +1,19 @@
+{
+  "claim_id": "ds-audit-01",
+  "source": "https://github.com/grobestreet/de-stress-lab",
+  "pin": "7290d788af7f537643a6d85eb378380f019d5deb",
+  "task_type": "REPRO",
+  "execution": "in_sandbox_regenerated",
+  "entrypoint": "destress audit-repo .",
+  "env": {
+    "python": ">=3.10",
+    "network": "none"
+  },
+  "claimed_value": {
+    "score": 100,
+    "grade": "A"
+  },
+  "metric": "reproducibility-readiness audit (destress audit-repo)",
+  "tolerance": 0,
+  "claimed_artifact": "audit-repo markdown score line"
+}

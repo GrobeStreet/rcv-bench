@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "ledger_id": "de-stress-2027-v1",
+  "title": "Dark-Energy Stress Lab frozen 2027 prediction ledger",
+  "created_utc": "2026-07-27T00:00:00Z",
+  "scoring_cutoff": "2027-12-31T23:59:59Z",
+  "release_tag": "prediction-ledger-2027-v1",
+  "immutable": true,
+  "amendment_policy": "Never replace this record. Publish clarifications or corrections as separately hashed amendments.",
+  "baseline": {
+    "held_out_lrg2_joint_p": 0.0408,
+    "held_out_lrg2_dv_abs_z": 2.3193600411593227,
+    "held_out_lrg2_ap_abs_z": 0.8843275696043786,
+    "direct_time_variation_sigma": 3.9999999999,
+    "direct_time_variation_without_lrg2_sigma": 1.8132063552978481,
+    "des5y_external_low_z_intercept_mag": 0.036
+  },
+  "predictions": [
+    {
+      "id": "P2027-01",
+      "claim": "The held-out isotropic distance residual for the final DESI tracer nearest z=0.706 has absolute z below 2.0.",
+      "forecast_probability": 0.65,
+      "metric": "abs_z_dv_over_rd",
+      "operator": "<",
+      "threshold": 2.0,
+      "qualifying_data": "Final public DESI BAO release available by the scoring cutoff."
+    },
+    {
+      "id": "P2027-02",
+      "claim": "The held-out Alcock-Paczynski ratio residual for the final DESI tracer nearest z=0.706 has absolute z below 1.5.",
+      "forecast_probability": 0.8,
+      "metric": "abs_z_dm_over_dh",
+      "operator": "<",
+      "threshold": 1.5,
+      "qualifying_data": "Final public DESI BAO release available by the scoring cutoff."
+    },
+    {
+      "id": "P2027-03",
+      "claim": "Final DESI BAO plus the baseline CMB combination prefers CPL time variation over constant-w at less than 3.0 sigma after calibration.",
+      "forecast_probability": 0.75,
+      "metric": "calibrated_time_variation_sigma",
+      "operator": "<",
+      "threshold": 3.0,
+      "qualifying_data": "Final public DESI BAO release and baseline likelihood configuration available by the scoring cutoff."
+    },
+    {
+      "id": "P2027-04",
+      "claim": "No single final-DESI tracer deletion reduces the direct time-variation equivalent significance by 0.75 sigma or more.",
+      "forecast_probability": 0.6,
+      "metric": "maximum_single_deletion_sigma_loss",
+      "operator": "<",
+      "threshold": 0.75,
+      "qualifying_data": "Final public DESI tracer-level BAO likelihood available by the scoring cutoff."
+    },
+    {
+      "id": "P2027-05",
+      "claim": "A qualifying Rubin-era survey-aware calibration fit has abs(low-z relative magnitude offset) below 0.020 mag and changes abs(Delta chi2) by less than 4.",
+      "forecast_probability": 0.6,
+      "metrics": [
+        {
+          "metric": "abs_low_z_relative_magnitude_offset",
+          "operator": "<",
+          "threshold": 0.02,
+          "unit": "mag"
+        },
+        {
+          "metric": "abs_delta_chi2_change_from_calibration",
+          "operator": "<",
+          "threshold": 4.0
+        }
+      ],
+      "qualifying_data": "First public Rubin-era supernova cosmology analysis with survey-aware low-z cross-calibration released by the cutoff; otherwise unscored."
+    },
+    {
+      "id": "P2027-06",
+      "claim": "Neither final DESI BAO nor a Rubin-era supernova analysis separately reports a look-elsewhere-aware 5-sigma rejection of constant-w in favor of time variation by the cutoff.",
+      "forecast_probability": 0.9,
+      "metric": "maximum_independent_time_variation_sigma",
+      "operator": "<",
+      "threshold": 5.0,
+      "qualifying_data": "Public final DESI or Rubin-era cosmology result by the cutoff."
+    }
+  ],
+  "scoring": {
+    "true": 1,
+    "false": 0,
+    "unscored": "Exclude only when the prediction's qualifying data do not exist by the cutoff.",
+    "conjunction_rule": "All thresholds in a conjunctive prediction must pass.",
+    "source_hierarchy": [
+      "Final collaboration paper and public likelihood.",
+      "Collaboration data release and documented baseline configuration.",
+      "Independent reproduction with the released de-stress-lab package."
+    ]
+  }
+}

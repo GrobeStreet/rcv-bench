@@ -1,0 +1,12 @@
+{
+  "verdict": "REPRODUCED",
+  "regenerated_value": "sha256:84caead127971ef6c8267cf8d148c6adc840407f099e717e9991764335e92f01",
+  "localized_cause": "none",
+  "confidence": 0.99,
+  "escalate": false,
+  "regeneration_status": "regenerated_in_sandbox_2026-08-25",
+  "evidence": [
+    "verify-ledger PASS; computed hash == frozen sidecar"
+  ],
+  "planted_defect": false
+}

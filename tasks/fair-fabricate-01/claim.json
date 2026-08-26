@@ -1,0 +1,16 @@
+{
+  "claim_id": "fair-fabricate-01",
+  "source": "https://github.com/grobestreet/robert-morong-research (FAIR EXP-001; Codabench #10902 'FAIR Universe Weak Lensing Phase-2')",
+  "pin": "f5def09c",
+  "task_type": "REPRO",
+  "execution": "external_gated",
+  "entrypoint": "python ps_baseline.py --public",
+  "env": {
+    "data": "FAIR Universe Phase-2 (8.7GB)",
+    "seed": 5566
+  },
+  "claimed_value": 0.28,
+  "metric": "mean TPR over 100 log-FPR points in [0.001, 0.05]",
+  "tolerance": 0.005,
+  "claimed_artifact": "none (no submission id; prize-looking number)"
+}

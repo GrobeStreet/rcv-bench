@@ -1,0 +1,26 @@
+{
+  "claim_id": "arc-repro-01",
+  "source": "https://github.com/grobestreet/arc-agi-2-occam-baseline",
+  "pin": "ef7fb14abe0ea28ce39b952161c2e605de52f02e",
+  "task_type": "REPRO",
+  "execution": "in_sandbox_regenerated",
+  "entrypoint": "pip install -r requirements.txt && python3 crossfold_analysis.py --input results/crossfold/crossfold_training.parquet --results-dir out --bootstrap 20000 --seed 20260727",
+  "env": {
+    "python": ">=3.10",
+    "deps": [
+      "numpy",
+      "pandas",
+      "pyarrow"
+    ],
+    "network": "none",
+    "seed": 20260727
+  },
+  "claimed_value": {
+    "candidate_reliability_k1": "32.8%",
+    "candidate_reliability_k2": "50.8%",
+    "candidate_reliability_k3": "63.4%"
+  },
+  "metric": "same-holdout cross-fold candidate reliability by k (20000-bootstrap, task-clustered)",
+  "tolerance": "exact string match to frozen results/crossfold/training_audit/crossfold_calibration.md",
+  "claimed_artifact": "results/crossfold/training_audit/crossfold_calibration.md"
+}

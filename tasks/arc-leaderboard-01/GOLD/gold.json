@@ -1,0 +1,18 @@
+{
+  "verdict": "FRAGILE",
+  "regenerated_value": {
+    "headline_gap_p": 0.16,
+    "significant": false,
+    "n_needed_5pt_gap_80pct_power": 1566,
+    "n_available": 120
+  },
+  "localized_cause": "underpowered-leaderboard (N=120 too small to resolve ~5-9pt frontier gaps)",
+  "confidence": 0.9,
+  "escalate": false,
+  "regeneration_status": "regenerated_in_sandbox_2026-08-25 (leaderboard_stats.py)",
+  "evidence": [
+    "headline 54.0% vs 45.0% -> p=0.16 (not significant)",
+    "resolving a 5-pt gap at 80% power needs n=1,566 tasks; the leaderboard has 120"
+  ],
+  "planted_defect": false
+}

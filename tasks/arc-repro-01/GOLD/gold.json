@@ -1,0 +1,16 @@
+{
+  "verdict": "REPRODUCED",
+  "regenerated_value": {
+    "k1": "32.8% [25.1, 40.4]",
+    "k2": "50.8% [37.8, 64.0]",
+    "k3": "63.4% [39.5, 86.0]"
+  },
+  "localized_cause": "none",
+  "confidence": 0.97,
+  "escalate": false,
+  "regeneration_status": "regenerated_in_sandbox_2026-08-25 (seeded bootstrap; rows match frozen training_audit byte-for-byte)",
+  "evidence": [
+    "crossfold_analysis.py --seed 20260727 reproduced candidate_reliability k=1/2/3 = 32.8/50.8/63.4 with identical CIs to the frozen file"
+  ],
+  "planted_defect": false
+}

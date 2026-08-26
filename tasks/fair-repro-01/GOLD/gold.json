@@ -1,0 +1,14 @@
+{
+  "verdict": "REPRODUCED",
+  "regenerated_value": 0.2092050284,
+  "delta_vs_claim": 0.0,
+  "localized_cause": "none",
+  "confidence": 0.95,
+  "escalate": false,
+  "regeneration_status": "external_verified_leaderboard (Codabench sub 900216); NOT re-run in this sandbox",
+  "evidence": [
+    "published PS-baseline ref ~0.2143 on pre-swap set; 0.2092 on current v2 set = faithful repro to ~2.4%",
+    "organizer stated not to force-match 0.2143 after the test-set swap"
+  ],
+  "planted_defect": false
+}

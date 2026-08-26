@@ -1,0 +1,100 @@
+[
+  {
+    "claim_id": "arc-leaderboard-01",
+    "verdict": "REPRODUCED",
+    "localized_cause": "none",
+    "confidence": 0.5,
+    "escalate": false
+  },
+  {
+    "claim_id": "arc-repro-01",
+    "verdict": "REPRODUCED",
+    "localized_cause": "none",
+    "confidence": 0.5,
+    "escalate": false
+  },
+  {
+    "claim_id": "arc-selfcorrect-01",
+    "verdict": "REPRODUCED",
+    "localized_cause": "none",
+    "confidence": 0.5,
+    "escalate": false
+  },
+  {
+    "claim_id": "ds-audit-01",
+    "verdict": "REPRODUCED",
+    "localized_cause": "none",
+    "confidence": 0.5,
+    "escalate": false
+  },
+  {
+    "claim_id": "ds-fabricate-01",
+    "verdict": "REPRODUCED",
+    "localized_cause": "none",
+    "confidence": 0.5,
+    "escalate": false
+  },
+  {
+    "claim_id": "ds-fragile-01",
+    "verdict": "REPRODUCED",
+    "localized_cause": "none",
+    "confidence": 0.5,
+    "escalate": false
+  },
+  {
+    "claim_id": "ds-integrity-01",
+    "verdict": "REPRODUCED",
+    "localized_cause": "none",
+    "confidence": 0.5,
+    "escalate": false
+  },
+  {
+    "claim_id": "ds-integrity-02",
+    "verdict": "REPRODUCED",
+    "localized_cause": "none",
+    "confidence": 0.5,
+    "escalate": false
+  },
+  {
+    "claim_id": "ds-repro-01",
+    "verdict": "REPRODUCED",
+    "localized_cause": "none",
+    "confidence": 0.5,
+    "escalate": false
+  },
+  {
+    "claim_id": "fair-deviation-01",
+    "verdict": "REPRODUCED",
+    "localized_cause": "none",
+    "confidence": 0.5,
+    "escalate": false
+  },
+  {
+    "claim_id": "fair-fabricate-01",
+    "verdict": "REPRODUCED",
+    "localized_cause": "none",
+    "confidence": 0.5,
+    "escalate": false
+  },
+  {
+    "claim_id": "fair-repro-01",
+    "verdict": "REPRODUCED",
+    "localized_cause": "none",
+    "confidence": 0.5,
+    "escalate": false
+  },
+  {
+    "claim_id": "mmlu-calib-deviation-01",
+    "verdict": "REPRODUCED",
+    "localized_cause": "none",
+    "confidence": 0.5,
+    "escalate": false
+  },
+  {
+    "claim_id": "mmlu-flip-01",
+    "verdict": "REPRODUCED",
+    "localized_cause": "none",
+    "confidence": 0.5,
+    "escalate": false
+  }
+]

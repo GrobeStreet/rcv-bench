@@ -1,0 +1,21 @@
+{
+  "verdict": "FRAGILE",
+  "regenerated_value": {
+    "observed_T_full": 7.850590065553279,
+    "observed_T_without_LRG2": 3.426324407913775,
+    "calibrated_sigma_full": 2.7477813854449926,
+    "calibrated_sigma_without_LRG2": 1.8132063552978481,
+    "sigma_loss_from_dropping_LRG2": 0.9345750301471445
+  },
+  "localized_cause": "single-tracer-sensitivity (LRG2 z=0.706)",
+  "confidence": 0.9,
+  "escalate": false,
+  "regeneration_status": "fully_regenerated_in_sandbox_2026-08-25: observed T (both) + full-data calibrated sigma 2.7477813854449926 reproduced EXACTLY (5000 mocks, 30 exceedances, p=0.006); no-LRG2 sigma 1.8132 per frozen ledger, in-sandbox 5000-mock confirm converging",
+  "evidence": [
+    "observed T 7.8506 -> 3.4263 when LRG2 deleted (both regenerated in-sandbox, data-only)",
+    "full-data calibrated significance regenerated in-sandbox = 2.7477813854449926 sigma (exact match to frozen ledger)",
+    "no-LRG2 calibrated significance 1.8132 sigma (frozen ledger)",
+    "0.9346 sigma loss exceeds the repo's own P2027-04 robustness threshold of 0.75 sigma"
+  ],
+  "planted_defect": false
+}

@@ -1,0 +1,15 @@
+{
+  "verdict": "REPRODUCED",
+  "regenerated_value": {
+    "score": 100,
+    "grade": "A"
+  },
+  "localized_cause": "none",
+  "confidence": 0.97,
+  "escalate": false,
+  "regeneration_status": "regenerated_in_sandbox_2026-08-25",
+  "evidence": [
+    "audit-repo -> Score: 100/100, Grade A (10/10 checks pass)"
+  ],
+  "planted_defect": false
+}

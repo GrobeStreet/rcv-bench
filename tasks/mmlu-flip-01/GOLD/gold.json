@@ -1,0 +1,19 @@
+{
+  "verdict": "FRAGILE",
+  "regenerated_value": {
+    "answer_flips_under_reorder": "78.33%",
+    "accuracy_on_flipping_questions": "34.15% (\u2248chance)",
+    "headline_accuracy_rotation0": "44.00%",
+    "all_rotation_accuracy": "43.08%",
+    "stable_rate": "21.67%"
+  },
+  "localized_cause": "option-order-sensitivity (semantically-null perturbation flips the answer)",
+  "confidence": 0.9,
+  "escalate": false,
+  "regeneration_status": "regenerated_in_sandbox_2026-08-26 (n=300, seed 0, fp32; EXACT match to repo fp32 column)",
+  "evidence": [
+    "78.33% of questions change the underlying answer under 4 cyclic reorderings (regenerated here)",
+    "accuracy on flipping questions 34.15% (near 25-33% chance) -> the accuracy is not a stable capability signal"
+  ],
+  "planted_defect": false
+}

@@ -1,0 +1,13 @@
+{
+  "verdict": "DEVIATION",
+  "regenerated_value": 0.00457,
+  "localized_cause": "score-sign-inversion",
+  "confidence": 0.95,
+  "escalate": false,
+  "regeneration_status": "documented_real_arc (Codabench sub 900214 = 0.00457 below chance); NOT re-run here",
+  "evidence": [
+    "OoD score sign inverted -> InD maps ranked most anomalous -> 0.00457 (< chance 0.0125)",
+    "one-line fix: negate scores (higher = more OoD) -> 0.2092 (sub 900216)"
+  ],
+  "planted_defect": true
+}

@@ -1,0 +1,1 @@
+DEVIATION (reported-vs-regenerated, in-sandbox): the frozen calibration/stability metrics (ECE 0.28, stable 35.7%, acc-on-stable 56.1%) do NOT reproduce — our in-sandbox run gives ECE 0.1367, stable 21.67%, acc-on-stable 75.38%. Correct verdict: DEVIATION, cause calibration-metric-nonreproduction.

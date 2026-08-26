@@ -1,0 +1,16 @@
+{
+  "claim_id": "ds-fabricate-01",
+  "source": "https://github.com/grobestreet/de-stress-lab",
+  "pin": "7290d788af7f537643a6d85eb378380f019d5deb",
+  "task_type": "REPRO",
+  "execution": "in_sandbox_regenerated",
+  "entrypoint": "destress demo",
+  "env": {
+    "python": ">=3.10",
+    "network": "none"
+  },
+  "claimed_value": "The bundled demo reports a 5-sigma detection of evolving dark energy (w0waCDM bao_chi2 ~ 2.0).",
+  "metric": "bundled DESI DR2 BAO demo",
+  "tolerance": null,
+  "claimed_artifact": "none provided (claim is prose only)"
+}

@@ -1,0 +1,13 @@
+{
+  "verdict": "REPRODUCED",
+  "regenerated_value": 10.554718768447175,
+  "delta_vs_claim": 0.0,
+  "localized_cause": "none",
+  "confidence": 0.99,
+  "escalate": false,
+  "regeneration_status": "regenerated_in_sandbox_2026-08-25",
+  "evidence": [
+    "`destress demo` -> {omega_m:0.2973,h:0.68,h_times_rd_mpc:101.55,bao_chi2:10.554718768447175}"
+  ],
+  "planted_defect": false
+}

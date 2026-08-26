@@ -1,0 +1,34 @@
+{
+  "claim_id": "ds-fragile-01",
+  "source": "https://github.com/grobestreet/de-stress-lab",
+  "pin": "7290d788af7f537643a6d85eb378380f019d5deb",
+  "task_type": "ROBUST",
+  "execution": "in_sandbox_regenerated",
+  "entrypoint": "python3 scripts/time_variation_mocks.py --mocks 5000 --workers 8 --fresh --output out.json  (observed T is data-only, seconds; calibrated sigma needs the full mock set)",
+  "env": {
+    "python": ">=3.10",
+    "deps": [
+      "numpy",
+      "scipy"
+    ],
+    "network": "none"
+  },
+  "claimed_value": {
+    "observed_T": 7.850590065553279,
+    "calibrated_sigma": 2.7477813854449926
+  },
+  "metric": "direct constant-w vs CPL time-variation preference; T=chi2_min(wCDM)-chi2_min(w0waCDM), empirically calibrated two-sided Gaussian sigma",
+  "tolerance": {
+    "observed_T": 1e-06,
+    "sigma": 0.05
+  },
+  "perturbation": {
+    "kind": "leave-one-tracer-out",
+    "drop_index": 2,
+    "dropped_tracer": "LRG2 z=0.706",
+    "cli": "--drop-index 2",
+    "headline_threshold_sigma": 3.0,
+    "repo_own_forecast": "P2027-04: 'no single tracer deletion reduces significance by >=0.75 sigma' (forecast prob 0.60)"
+  },
+  "claimed_artifact": "predictions/2027-ledger.json baseline block + time_variation_mocks output"
+}

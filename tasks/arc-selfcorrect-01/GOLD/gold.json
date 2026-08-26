@@ -1,0 +1,18 @@
+{
+  "verdict": "DEVIATION",
+  "regenerated_value": {
+    "corrected_calibration": "32.8% / 50.8% / 63.4% at k=1/2/3",
+    "corrected_selection_lever": "MDL beats random by +11.1 pts [95% CI +4.6, +17.9]",
+    "oracle_over_mdl": "+3.7 pts [+0.1, +9.5]"
+  },
+  "localized_cause": "prefix-vs-same-holdout selection bias (target leakage in the earlier prefix design)",
+  "confidence": 0.9,
+  "escalate": false,
+  "regeneration_status": "corrected numbers regenerated_in_sandbox_2026-08-25; self-correction documented by the repo (README/PAPER)",
+  "evidence": [
+    "earlier prefix analysis ~50->87->95 and +24pt lever overturned by same-holdout design",
+    "corrected reliability 32.8/50.8/63.4 and +11.1pt MDL lever regenerated from bundled data",
+    "repo published the correction rather than replacing the record silently"
+  ],
+  "planted_defect": false
+}

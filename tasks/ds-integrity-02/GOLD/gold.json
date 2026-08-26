@@ -1,0 +1,13 @@
+{
+  "verdict": "DEVIATION",
+  "regenerated_value": "sha256:cb26105f0803169435cf24117b776a0afb7861d14fcceeff363ac299e5f3bc8c",
+  "localized_cause": "hash-mismatch",
+  "confidence": 0.98,
+  "escalate": false,
+  "regeneration_status": "regenerated_in_sandbox_2026-08-25",
+  "evidence": [
+    "computed cb26105f... != frozen sidecar 84caead1...",
+    "tampered field: baseline.direct_time_variation_sigma 2.7477813854449926 -> 3.9999999999"
+  ],
+  "planted_defect": true
+}
