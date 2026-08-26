@@ -6,17 +6,20 @@ Three modes are supported:
   --agent MOD:FN  in-process Python callable (developer convenience)
   --policy NAME   deterministic reference policy
 
-The agent-visible task directory contains claim.json, README.md, and env/ when
-present, but never GOLD/. For a serious evaluation, run this harness in an
-environment where the agent cannot access the benchmark checkout itself.
+The agent-visible task directory contains claim.json, README.md, env/ when
+present, and (with --stage-source) a pinned source checkout, but never GOLD/.
+For a serious evaluation, run the agent in an environment where it cannot access
+the benchmark checkout itself.
 """
 from __future__ import annotations
 
 import argparse
 import glob
+import hashlib
 import importlib
 import json
 import os
+import re
 import shlex
 import shutil
 import subprocess
@@ -29,14 +32,90 @@ except ImportError:
     from harness.agent_protocol import parse_agent_stdout, validate_verdict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+GITHUB_RE = re.compile(r"https://github\.com/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)")
 
 
-def task_sources():
+def task_sources(include=None):
+    wanted = set(include or [])
     for cj in sorted(glob.glob(os.path.join(ROOT, "tasks", "*", "claim.json"))):
+        cid = os.path.basename(os.path.dirname(cj))
+        if wanted and cid not in wanted:
+            continue
         yield cj
 
 
-def sanitized_task(cj, tmp_root):
+def _source_url(claim):
+    raw = str(claim.get("source", ""))
+    m = GITHUB_RE.search(raw)
+    if not m:
+        return None
+    owner, repo = m.groups()
+    return f"https://github.com/{owner}/{repo}.git"
+
+
+def _cache_key(url, pin):
+    return hashlib.sha256(f"{url}@{pin}".encode()).hexdigest()[:16]
+
+
+def stage_source_checkout(claim, dst_dir, cache_root):
+    """Clone the declared source and freeze it at the declared pin before agent execution.
+
+    This setup step may use network access. The agent process itself can then be run
+    with network disabled. Failures are recorded rather than silently ignored.
+    """
+    url = _source_url(claim)
+    pin = str(claim.get("pin") or "").strip()
+    provenance = {
+        "declared_source": claim.get("source"),
+        "declared_pin": pin,
+        "staged": False,
+    }
+    if not url or not pin:
+        provenance["error"] = "source URL or pin could not be parsed"
+        with open(os.path.join(dst_dir, "SOURCE_PROVENANCE.json"), "w") as f:
+            json.dump(provenance, f, indent=2)
+        return provenance
+
+    cache = os.path.join(cache_root, _cache_key(url, pin))
+    try:
+        if not os.path.isdir(os.path.join(cache, ".git")):
+            subprocess.run(
+                ["git", "clone", "--quiet", "--no-checkout", url, cache],
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                timeout=180,
+            )
+            subprocess.run(
+                ["git", "-C", cache, "checkout", "--quiet", pin],
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                timeout=120,
+            )
+        head = subprocess.check_output(
+            ["git", "-C", cache, "rev-parse", "HEAD"], text=True
+        ).strip()
+        source_dst = os.path.join(dst_dir, "source")
+        shutil.copytree(cache, source_dst)
+        provenance.update({
+            "staged": True,
+            "resolved_url": url,
+            "resolved_head": head,
+            "source_dir": "source",
+        })
+        claim["source_dir"] = "source"
+    except Exception as exc:
+        provenance["error"] = f"{type(exc).__name__}: {exc}"
+
+    with open(os.path.join(dst_dir, "SOURCE_PROVENANCE.json"), "w") as f:
+        json.dump(provenance, f, indent=2)
+    return provenance
+
+
+def sanitized_task(cj, tmp_root, stage_source=False):
     src_dir = os.path.dirname(cj)
     cid = os.path.basename(src_dir)
     dst_dir = os.path.join(tmp_root, cid)
@@ -50,6 +129,10 @@ def sanitized_task(cj, tmp_root):
         shutil.copytree(env_src, os.path.join(dst_dir, "env"))
     with open(cj) as f:
         claim = json.load(f)
+    if stage_source:
+        cache_root = os.path.join(tmp_root, "_source_cache")
+        os.makedirs(cache_root, exist_ok=True)
+        stage_source_checkout(claim, dst_dir, cache_root)
     claim["task_dir"] = dst_dir
     return claim
 
@@ -114,10 +197,12 @@ def main():
     g.add_argument("--command", help="external agent command; task JSON via stdin, verdict JSON via stdout")
     g.add_argument("--agent", help="Python module:function callable")
     g.add_argument("--policy", choices=["naive_rerun", "always_reproduced"])
-    ap.add_argument("--timeout", type=float, default=300.0, help="per-task timeout for --command")
+    ap.add_argument("--timeout", type=float, default=900.0, help="per-task timeout for --command")
     ap.add_argument("--out", default="predictions.json")
     ap.add_argument("--trace", default=None, help="optional JSONL execution trace path")
     ap.add_argument("--fail-fast", action="store_true")
+    ap.add_argument("--stage-source", action="store_true", help="pre-clone declared source at declared pin into task_dir/source")
+    ap.add_argument("--include", nargs="*", default=None, help="optional claim IDs to run")
     args = ap.parse_args()
 
     agent = None
@@ -129,8 +214,8 @@ def main():
     preds = []
     trace = []
     with tempfile.TemporaryDirectory(prefix="rcv-bench-agent-") as tmp_root:
-        for cj in task_sources():
-            task = sanitized_task(cj, tmp_root)
+        for cj in task_sources(args.include):
+            task = sanitized_task(cj, tmp_root, stage_source=args.stage_source)
             started = time.monotonic()
             meta = {}
             try:
