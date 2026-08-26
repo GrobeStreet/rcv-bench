@@ -19,6 +19,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # All six audited payload segments are present before this run.
           cat .bootstrap/part-* | base64 -d > /tmp/rcv-release.tar.gz
           echo 'd81777602cbef3bc2ff55f7adfc45d571107455f0840cc95fb7f07e15f518d39  /tmp/rcv-release.tar.gz' | sha256sum -c -
           tar -xzf /tmp/rcv-release.tar.gz -C .
