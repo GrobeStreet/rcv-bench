@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Diagnose transferred payload
+      - name: Verify repaired payload and publish
         shell: bash
         run: |
           set -euo pipefail
