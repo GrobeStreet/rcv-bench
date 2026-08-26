@@ -1,0 +1,31 @@
+name: rcv-bench-ci
+on:
+  push: { branches: [main] }
+  pull_request: { branches: [main] }
+jobs:
+  regenerate-and-score:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install
+        run: pip install -r requirements.txt
+      - name: Clone source repo at pin (for tampered-ledger staging)
+        run: git clone --depth 1 https://github.com/grobestreet/de-stress-lab.git && (cd de-stress-lab && git fetch --depth 1 origin 7290d788af7f537643a6d85eb378380f019d5deb && git checkout 7290d788af7f537643a6d85eb378380f019d5deb)
+      - name: Regenerate task tree (deterministic; must match committed tree)
+        run: |
+          python build_tasks.py
+          git diff --exit-code tasks/ || (echo "::error::task tree drifted from build_tasks.py" && exit 1)
+      - name: Run reference baselines
+        run: |
+          python baselines/always_reproduced.py
+          python baselines/naive_rerun.py
+      - name: Score baselines (assert known headroom)
+        run: |
+          python scoring/score.py baselines/predictions_always_reproduced.json --name always-REPRODUCED | tee /tmp/a.txt
+          python scoring/score.py baselines/predictions_naive_rerun.json --name naive-rerun | tee /tmp/n.txt
+          grep -q "5/14" /tmp/a.txt || (echo "::error::always-REPRODUCED baseline changed" && exit 1)
+          grep -q "9/14" /tmp/n.txt || (echo "::error::naive-rerun baseline changed" && exit 1)
+      - name: Harness smoke (runs a policy through the agent contract)
+        run: python harness/run.py --policy naive_rerun --out /tmp/preds.json
