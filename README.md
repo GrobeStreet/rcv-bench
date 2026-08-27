@@ -31,6 +31,8 @@ The three FAIR tasks are **external-gated** because the full Phase-2 data and Co
 
 Until those receipts are anchored in the canonical FAIR repository, RCV-Bench treats the FAIR numerical arc as a **documented project record used for task logic, not independently verified benchmark gold**. The canonical FAIR repository is the authority for external-score status.
 
+`build_tasks_reconciled.py` is the current authoritative task-tree build entry point. It runs the legacy deterministic generator and then enforces this corrected FAIR evidence state. CI verifies that its output exactly matches the committed task tree.
+
 ## Reference baselines
 
 | system | verdict acc | macro-F1 | FRAGILE recall | FABRICATED recall |
@@ -61,7 +63,7 @@ This is **not a frontier-model claim**. It is the first end-to-end real-agent ba
 ## Run it
 
 ```bash
-python3 build_tasks.py
+python3 build_tasks_reconciled.py
 python3 baselines/always_reproduced.py
 python3 baselines/naive_rerun.py
 python3 scoring/score.py baselines/predictions_naive_rerun.json --name naive-rerun
