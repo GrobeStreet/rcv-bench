@@ -15,8 +15,8 @@ jobs:
         run: git clone --depth 1 https://github.com/grobestreet/de-stress-lab.git && (cd de-stress-lab && git fetch --depth 1 origin 7290d788af7f537643a6d85eb378380f019d5deb && git checkout 7290d788af7f537643a6d85eb378380f019d5deb)
       - name: Regenerate task tree (deterministic; must match committed tree)
         run: |
-          python build_tasks.py
-          git diff --exit-code tasks/ || (echo "::error::task tree drifted from build_tasks.py" && exit 1)
+          python build_tasks_reconciled.py
+          git diff --exit-code tasks/ || (echo "::error::task tree drifted from reconciled builder" && exit 1)
       - name: Run reference baselines
         run: |
           python baselines/always_reproduced.py
