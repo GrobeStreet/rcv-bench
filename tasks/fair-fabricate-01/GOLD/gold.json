@@ -4,9 +4,10 @@
   "localized_cause": "doctored-value",
   "confidence": 0.9,
   "escalate": false,
-  "regeneration_status": "true value external_verified 0.2092 (sub 900216); claim 0.28 has no backing",
+  "regeneration_status": "documented_project_record; external_gated; comparison value not yet anchored as an external receipt in canonical fair-universe-2026 public registry",
   "evidence": [
-    "claimed 0.28 has no submission artifact; the deterministic PS baseline yields 0.2092"
+    "the planted 0.28 claim has no supporting submission artifact",
+    "the comparison value approximately 0.2092 is retained as a documented project record pending canonical receipt reconciliation"
   ],
   "planted_defect": true
 }
