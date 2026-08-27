@@ -4,10 +4,11 @@
   "localized_cause": "score-sign-inversion",
   "confidence": 0.95,
   "escalate": false,
-  "regeneration_status": "documented_real_arc (Codabench sub 900214 = 0.00457 below chance); NOT re-run here",
+  "regeneration_status": "documented_project_record; external_gated; Codabench receipt not yet anchored in canonical fair-universe-2026 public registry",
   "evidence": [
-    "OoD score sign inverted -> InD maps ranked most anomalous -> 0.00457 (< chance 0.0125)",
-    "one-line fix: negate scores (higher = more OoD) -> 0.2092 (sub 900216)"
+    "project record: inverted OoD score orientation produces 0.00457 below chance",
+    "project record: corrected orientation is recorded as approximately 0.2092",
+    "external receipt remains unverified by the canonical public FAIR submission registry"
   ],
   "planted_defect": true
 }
