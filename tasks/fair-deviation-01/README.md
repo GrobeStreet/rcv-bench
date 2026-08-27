@@ -1,3 +1,5 @@
-Reproduction requires the 8.7GB FAIR Universe Phase-2 dataset + Codabench, not available in this sandbox. Gold below is the externally-graded leaderboard receipt / documented arc; execution=external_gated (live re-run is v1).
+Reproduction requires the 8.7 GB FAIR Universe Phase-2 dataset plus Codabench, so this task is `external_gated` and is not rerun inside RCV-Bench.
 
-DEVIATION (planted, REAL bug): the supplied code inverts the OoD score sign, scoring 0.00457 (below chance). Correct verdict: DEVIATION, cause score-sign-inversion. This is the actual documented FAIR arc.
+The task uses a documented project record in which a score-sign inversion produces a below-chance result and the expected verdict is `DEVIATION` with cause `score-sign-inversion`.
+
+Important evidence-state limit: the current canonical `GrobeStreet/fair-universe-2026` public submission registry does not yet anchor the corresponding Codabench receipt. Therefore RCV-Bench must not describe this numerical record as independently verified external gold until that canonical project record is reconciled.

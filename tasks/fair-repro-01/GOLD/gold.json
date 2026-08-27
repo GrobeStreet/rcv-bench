@@ -5,10 +5,10 @@
   "localized_cause": "none",
   "confidence": 0.95,
   "escalate": false,
-  "regeneration_status": "external_verified_leaderboard (Codabench sub 900216); NOT re-run in this sandbox",
+  "regeneration_status": "documented_project_record; external_gated; external receipt not yet anchored in canonical fair-universe-2026 public registry",
   "evidence": [
-    "published PS-baseline ref ~0.2143 on pre-swap set; 0.2092 on current v2 set = faithful repro to ~2.4%",
-    "organizer stated not to force-match 0.2143 after the test-set swap"
+    "published historical power-spectrum baseline reference is approximately 0.2143 on the pre-swap test set",
+    "the approximately 0.2092 current-set value is retained as a documented project record pending canonical external-receipt reconciliation"
   ],
   "planted_defect": false
 }
