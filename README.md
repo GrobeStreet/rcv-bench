@@ -4,6 +4,8 @@
 
 The benchmark is built around a simple distinction: **re-execution is not the same thing as verification.**
 
+**Dataset on Hugging Face:** [GrobeStreet/rcv-bench](https://huggingface.co/datasets/GrobeStreet/rcv-bench) — same corpus, card, and baselines (CC BY 4.0).
+
 ## v1 harness
 
 `harness/run.py --command ...` creates a sanitized per-task workspace, withholds `GOLD/`, sends the task packet to an external process, validates the returned JSON verdict, records runtime/errors, and writes predictions consumable by the scorer. See [`harness/AGENT_PROTOCOL.md`](harness/AGENT_PROTOCOL.md).
