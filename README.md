@@ -1,6 +1,6 @@
 # RCV-Bench — Research-Claim Verification Benchmark
 
-**Can an agent tell whether a claimed research result is actually supported?** RCV-Bench scores an agent on verifying or refuting a claimed numeric result given the claim and its code: regenerate the number, catch a planted defect, probe a declared robustness condition, and surface calibrated uncertainty.
+**Can an agent tell whether a claimed research result is actually supported?** RCV-Bench evaluates a capability that ordinary reruns do not: given a claim and its code/evidence, can an agent regenerate the result, distinguish a real deviation from an execution problem, catch missing or fabricated support, probe a declared robustness condition, and express uncertainty without seeing the answer key?
 
 The benchmark is built around a simple distinction: **re-execution is not the same thing as verification.**
 
@@ -62,6 +62,10 @@ Result on all 14 tasks:
 
 This is **not a frontier-model claim**. It is the first end-to-end real-agent baseline demonstrating that tool use and autonomous execution do not by themselves produce robust claim-verification behavior. The run artifact and execution trace are preserved in GitHub Actions from workflow run `33020049937`.
 
+## Evaluate your own agent
+
+The v1 harness accepts any external process that reads one task JSON from stdin and emits one verdict JSON to stdout. External runs are welcome. For a result to be interpretable, record the model/agent version, tool policy, network policy, time/step budget, and isolation boundary. Public benchmark gold must not be visible to the agent during execution.
+
 ## Run it
 
 ```bash
@@ -95,6 +99,7 @@ leaderboard/ public result presentation
 - Eleven tasks can be regenerated in the benchmark environment or through the included local reproduction path.
 - The three FAIR tasks remain external-gated; their current numerical records must not be described as independently verified until the canonical FAIR repository anchors the relevant external receipts.
 - Public gold exists for auditability, so publishable agent results require an execution boundary that prevents the agent from reading the benchmark checkout or public gold during the run.
+- Public task content can also create memorization/contamination risk for pretrained systems; held-out/private packs are a stronger future evaluation condition.
 - The first real-agent result above is a small open-weight baseline, not a general statement about frontier systems.
 
 ## Next decisive work
