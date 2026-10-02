@@ -66,6 +66,8 @@ This is **not a frontier-model claim**. It is the first end-to-end real-agent ba
 
 The v1 harness accepts any external process that reads one task JSON from stdin and emits one verdict JSON to stdout. External runs are welcome. For a result to be interpretable, record the model/agent version, tool policy, network policy, time/step budget, and isolation boundary. Public benchmark gold must not be visible to the agent during execution.
 
+**Want to contribute a run?** Use [issue #3](https://github.com/GrobeStreet/rcv-bench/issues/3) as the public coordination thread.
+
 ## Run it
 
 ```bash
