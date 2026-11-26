@@ -1,0 +1,14 @@
+{"claim_id": "arc-leaderboard-01", "seconds": 0.0345326099999852, "stderr": "[adapter] arc-leaderboard-01: translated to ResearchGym task at /tmp/rcv-rg-work/rcv-arc-leaderboard-01\n"}
+{"claim_id": "arc-repro-01", "seconds": 0.03599678400001949, "stderr": "[adapter] arc-repro-01: translated to ResearchGym task at /tmp/rcv-rg-work/rcv-arc-repro-01\n"}
+{"claim_id": "arc-selfcorrect-01", "seconds": 0.0303971359999764, "stderr": "[adapter] arc-selfcorrect-01: translated to ResearchGym task at /tmp/rcv-rg-work/rcv-arc-selfcorrect-01\n"}
+{"claim_id": "ds-audit-01", "seconds": 0.030383106999977372, "stderr": "[adapter] ds-audit-01: translated to ResearchGym task at /tmp/rcv-rg-work/rcv-ds-audit-01\n"}
+{"claim_id": "ds-fabricate-01", "seconds": 0.036423721999994996, "stderr": "[adapter] ds-fabricate-01: translated to ResearchGym task at /tmp/rcv-rg-work/rcv-ds-fabricate-01\n"}
+{"claim_id": "ds-fragile-01", "seconds": 0.0335279299999911, "stderr": "[adapter] ds-fragile-01: translated to ResearchGym task at /tmp/rcv-rg-work/rcv-ds-fragile-01\n"}
+{"claim_id": "ds-integrity-01", "seconds": 0.030350837000014508, "stderr": "[adapter] ds-integrity-01: translated to ResearchGym task at /tmp/rcv-rg-work/rcv-ds-integrity-01\n"}
+{"claim_id": "ds-integrity-02", "seconds": 0.030064572000014778, "stderr": "[adapter] ds-integrity-02: translated to ResearchGym task at /tmp/rcv-rg-work/rcv-ds-integrity-02\n"}
+{"claim_id": "ds-repro-01", "seconds": 0.030169482000019343, "stderr": "[adapter] ds-repro-01: translated to ResearchGym task at /tmp/rcv-rg-work/rcv-ds-repro-01\n"}
+{"claim_id": "fair-deviation-01", "seconds": 0.03011150899999393, "stderr": "[adapter] fair-deviation-01: translated to ResearchGym task at /tmp/rcv-rg-work/rcv-fair-deviation-01\n"}
+{"claim_id": "fair-fabricate-01", "seconds": 0.03014435099998991, "stderr": "[adapter] fair-fabricate-01: translated to ResearchGym task at /tmp/rcv-rg-work/rcv-fair-fabricate-01\n"}
+{"claim_id": "fair-repro-01", "seconds": 0.030034192000016446, "stderr": "[adapter] fair-repro-01: translated to ResearchGym task at /tmp/rcv-rg-work/rcv-fair-repro-01\n"}
+{"claim_id": "mmlu-calib-deviation-01", "seconds": 0.02992430599999807, "stderr": "[adapter] mmlu-calib-deviation-01: translated to ResearchGym task at /tmp/rcv-rg-work/rcv-mmlu-calib-deviation-01\n"}
+{"claim_id": "mmlu-flip-01", "seconds": 0.029946112000004632, "stderr": "[adapter] mmlu-flip-01: translated to ResearchGym task at /tmp/rcv-rg-work/rcv-mmlu-flip-01\n"}
