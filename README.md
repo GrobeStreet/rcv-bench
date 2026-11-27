@@ -42,9 +42,38 @@ Until those receipts are anchored in the canonical FAIR repository, RCV-Bench tr
 | always-REPRODUCED | 5/14 (0.357) | 0.132 | 0/3 | 0/2 |
 | naive-rerun | 9/14 (0.643) | 0.392 | 0/3 | 0/2 |
 | task-type-shortcut | 8/14 (0.571) | 0.406 | **3/3** | 0/2 |
+| README shortcut (probe, fixed) | 5/14 (0.357) | 0.132 | 0/3 | 0/2 |
 | perfect ceiling | 14/14 (1.000) | 1.000 | 3/3 | 2/2 |
 
 The naive-rerun policy recomputes the headline but does not probe the declared perturbation or provenance failure mode. It therefore looks competent overall while missing every FRAGILE and FABRICATED task.
+
+### Fixed: the task README leaked gold (v1, found and closed 2026-11-26)
+
+`harness/run.py::sanitized_task()` copies `tasks/<id>/README.md` into the directory the agent
+reads, and in v1 that file was the **curator note**. Nine of the fourteen notes stated their own
+gold verdict in prose ("Correct verdict: FRAGILE"), and several printed the gold regenerated
+values the scorer compares against.
+
+`baselines/readme_verdict_shortcut.py` measures it. The policy opens `README.md`, regexes out a
+verdict-class token, returns it, and performs **no verification of any kind**:
+
+| | verdict acc | macro-F1 | FRAGILE recall | FABRICATED recall |
+|---|---:|---:|---:|---:|
+| README shortcut, v1 tree | **1.000 (14/14)** | **1.000** | 3/3 | 2/2 |
+| README shortcut, after fix | 0.357 (5/14) | 0.132 | 0/3 | 0/2 |
+
+A perfect score with no work done. **Any RCV-Bench v1 number produced by an agent that read
+`README.md` is uninterpretable**, which includes the external-agent protocol as documented, since
+`AGENT_PROTOCOL.md` instructs agents to inspect files in the task directory. In practice the
+published baselines are unaffected -- `always-REPRODUCED`, `naive-rerun` and `task-type-shortcut`
+never open the README, and the `qwen2.5-coder:1.5b` run had access and did not exploit it -- but
+the channel was open to any capable agent, so those scores were luck, not design.
+
+The fix: curator prose moved to `GOLD/CURATOR_NOTES.md` (never copied), the agent-visible README
+is generated from the claim packet by `harness/task_readme.py`, both task builders write through
+that one function, and `tests/test_no_gold_leakage.py` fails CI if a verdict class appears in any
+agent-visible file or if the shortcut ever beats the floor again. The probe baseline is kept as a
+permanent regression check rather than deleted.
 
 ### Known leakage: FRAGILE recall is gameable in v1
 

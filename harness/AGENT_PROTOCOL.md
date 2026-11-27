@@ -77,6 +77,13 @@ Provider credentials and inference costs are intentionally outside the benchmark
 
 ## Gold isolation and evaluation integrity
 
+`README.md` in that directory is **generated from the claim packet** by
+`harness/task_readme.py`. It carries no gold. Curator commentary lives in
+`GOLD/CURATOR_NOTES.md` and is never copied, because in v1 it was shipped to the
+agent and named the gold verdict outright; see the leakage section of the
+repository README and `tests/test_no_gold_leakage.py`, which fails CI if a
+verdict class reappears in any agent-visible file.
+
 The sanitized directory does not contain `GOLD/`, but this alone is not a hard
 security boundary. An agent with unrestricted filesystem access could inspect the
 parent benchmark checkout and leak gold.

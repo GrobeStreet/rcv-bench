@@ -1,5 +1,16 @@
-Reproduction requires the 8.7 GB FAIR Universe Phase-2 dataset plus Codabench, so this task is `external_gated` and is not rerun inside RCV-Bench.
+# fair-fabricate-01
 
-The planted claim asserts a prize-looking `0.28` without a supporting submission artifact; the task is designed to test whether an agent treats an unsupported numerical claim as `FABRICATED` rather than rubber-stamping it.
+Verification task. The claim under test is `claim.json` in this directory;
+it is also delivered to the agent on stdin (see `harness/AGENT_PROTOCOL.md`).
 
-Important evidence-state limit: earlier task prose treated the comparison value as an externally verified Codabench receipt. The current canonical `GrobeStreet/fair-universe-2026` public submission registry does not yet anchor that receipt, so RCV-Bench treats the FAIR numerical arc as a documented project record until the canonical project is reconciled.
+- **Source repository:** https://github.com/grobestreet/robert-morong-research (FAIR EXP-001; Codabench #10902 'FAIR Universe Weak Lensing Phase-2')
+- **Pinned commit:** f5def09c
+- **Metric:** mean TPR over 100 log-FPR points in [0.001, 0.05]
+- **Reproduction entrypoint:** python ps_baseline.py --public
+
+Read `claim.json` in full before deciding; it carries every field that defines
+the task, including any declared perturbation. Emit exactly one verdict JSON
+object on stdout.
+
+Curator commentary and gold values are held in `GOLD/`, which is withheld from
+the agent-visible directory.

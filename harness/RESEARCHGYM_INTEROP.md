@@ -87,7 +87,25 @@ These do not compose. Two translations are required:
 
 ---
 
-## A leakage issue this test surfaced in RCV-Bench itself
+## Two leakage issues this test surfaced in RCV-Bench itself
+
+### 1. The agent-visible README carried the gold verdict
+
+Building the sanitized workspace for this test meant reading
+`harness/run.py::sanitized_task()` closely, which copies `tasks/<id>/README.md` into the directory
+the agent reads. In v1 that file was the curator note: 9 of 14 stated the gold verdict in prose and
+several printed the gold regenerated values. `baselines/readme_verdict_shortcut.py` greps it,
+performs no verification, and scored **14/14 verdict accuracy, macro-F1 1.000** on the v1 tree.
+
+Fixed the same day: curator prose moved to `GOLD/CURATOR_NOTES.md`, the agent-visible README is
+generated from the claim packet, and `tests/test_no_gold_leakage.py` fails CI if a verdict class
+reappears in any agent-visible file. The probe now scores 0.357, the always-REPRODUCED floor.
+
+This matters for any cross-framework comparison: an RCV-Bench score from an agent that read
+`README.md` on the v1 tree is uninterpretable. The numbers in this report are unaffected -- the
+mock backend never opens it -- but a live RGAgent run would have had the answer in its workspace.
+
+### 2. `task_type` is a one-to-one tell for FRAGILE
 
 - The sanitized packet exposes `task_type`.
 - **All three `ROBUST`-type tasks have gold `FRAGILE`** (`ds-fragile-01`, `arc-leaderboard-01`,

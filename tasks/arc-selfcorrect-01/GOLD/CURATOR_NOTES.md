@@ -1,0 +1,1 @@
+DEVIATION (self-correction): the earlier optimistic calibration (~50/87/95) and +24pt selection lever were overturned by a leakage-free same-holdout design (32.8/50.8/63.4; +11.1pt). Correct verdict on the OLD claim: DEVIATION, cause prefix-vs-same-holdout selection bias.

@@ -12,6 +12,9 @@ from pathlib import Path
 import json
 import subprocess
 import sys
+import sys as _sys, pathlib as _pl
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parent / "harness"))
+from task_readme import agent_readme
 
 ROOT = Path(__file__).resolve().parent
 subprocess.run([sys.executable, str(ROOT / "build_tasks.py")], check=True)
@@ -86,7 +89,12 @@ Important evidence-state limit: earlier prose described the numerical result as 
 
 for task_id, packet in packets.items():
     task_dir = ROOT / "tasks" / task_id
-    (task_dir / "README.md").write_text(packet["readme"], encoding="utf-8")
+    (task_dir / "GOLD").mkdir(parents=True, exist_ok=True)
+    (task_dir / "GOLD" / "CURATOR_NOTES.md").write_text(
+        packet["readme"].strip() + "\n", encoding="utf-8"
+    )
+    claim = json.loads((task_dir / "claim.json").read_text(encoding="utf-8"))
+    (task_dir / "README.md").write_text(agent_readme(claim), encoding="utf-8")
     (task_dir / "GOLD" / "gold.json").write_text(
         json.dumps(packet["gold"], indent=2) + "\n", encoding="utf-8"
     )
