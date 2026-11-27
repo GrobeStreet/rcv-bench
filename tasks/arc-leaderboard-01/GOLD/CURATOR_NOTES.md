@@ -1,0 +1,1 @@
+ROBUST: the 'SOTA gap' on the N=120 ARC-AGI-2 leaderboard does not survive a significance/power check (p=0.16; ~1,566 tasks needed for a 5-pt gap). Correct verdict: FRAGILE. An agent that reads the raw ranking as a real gap misses it.

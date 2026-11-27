@@ -1,0 +1,1 @@
+ROBUST (in-sandbox): MMLU accuracy (44%) is FRAGILE to a semantically-null option reorder — 78.33% answer flips; flip-set accuracy 34% (~chance). Regenerated here via harness/mmlu_live.py, exact match to the repo's fp32 record. Correct verdict: FRAGILE.

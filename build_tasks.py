@@ -5,6 +5,9 @@ seed instances. Gold values below were REGENERATED in-sandbox (de-stress) or are
 externally-verified receipts (FAIR); provenance/execution flags say which.
 Deterministic; safe to re-run."""
 import json, os, shutil, hashlib, pathlib
+import sys as _sys, pathlib as _pl
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parent / "harness"))
+from task_readme import agent_readme
 
 ROOT = pathlib.Path(__file__).resolve().parent
 TASKS = ROOT / "tasks"
@@ -30,7 +33,9 @@ def write(instance):
     gold = dict(instance["_gold"])
     gold["planted_defect"] = instance.get("planted_defect", False)  # gold-side only
     (d / "GOLD" / "gold.json").write_text(json.dumps(gold, indent=2) + "\n")
-    (d / "README.md").write_text(instance["_readme"].strip() + "\n")
+    (d / "GOLD").mkdir(parents=True, exist_ok=True)
+    (d / "GOLD" / "CURATOR_NOTES.md").write_text(instance["_readme"].strip() + "\n")
+    (d / "README.md").write_text(agent_readme(claim))
     for rel, abssrc in instance.get("_env_files", {}).items():
         dst = d / rel
         dst.parent.mkdir(parents=True, exist_ok=True)
