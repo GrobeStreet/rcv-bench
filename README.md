@@ -41,9 +41,32 @@ Until those receipts are anchored in the canonical FAIR repository, RCV-Bench tr
 |---|---:|---:|---:|---:|
 | always-REPRODUCED | 5/14 (0.357) | 0.132 | 0/3 | 0/2 |
 | naive-rerun | 9/14 (0.643) | 0.392 | 0/3 | 0/2 |
+| task-type-shortcut | 8/14 (0.571) | 0.406 | **3/3** | 0/2 |
 | perfect ceiling | 14/14 (1.000) | 1.000 | 3/3 | 2/2 |
 
 The naive-rerun policy recomputes the headline but does not probe the declared perturbation or provenance failure mode. It therefore looks competent overall while missing every FRAGILE and FABRICATED task.
+
+### Known leakage: FRAGILE recall is gameable in v1
+
+In the v1 corpus `task_type == "ROBUST"`, the presence of a `perturbation` block, and
+`gold == FRAGILE` are perfectly aligned (3/3), and the `ROBUST` verdict class is declared but
+never used as gold. The `task-type-shortcut` baseline exploits exactly that: it reads only the
+structural tell, performs no verification at all, and still takes **FRAGILE recall 3/3 (F1 1.00)** --
+a metric on which every other baseline, including the real local agent, scores 0/3. Its verdict
+accuracy (0.571) stays below naive-rerun (0.643). Its macro-F1 (0.406) is nominally above
+naive-rerun's (0.392), but that 0.014 gap on 14 instances is inside noise and is not a ranking.
+
+The finding rests on three instances, so the claim is deliberately narrow: the `ROBUST` class is
+unpopulated in v1 and its task type is a one-to-one tell, which makes FRAGILE recall uninformative
+on this corpus.
+
+Withholding `task_type` would not close this, because the `perturbation` block carries the same
+signal. Closing it properly requires v2 instances whose declared perturbation **holds** (gold
+`ROBUST`), so the robustness task type stops being a one-to-one tell. Until then, FRAGILE recall
+on v1 is uninformative unless an agent also beats this shortcut on macro-F1 and localization.
+
+Found by an external interoperability test; see
+[`harness/RESEARCHGYM_INTEROP.md`](harness/RESEARCHGYM_INTEROP.md).
 
 ## First real-agent baseline
 
@@ -74,6 +97,7 @@ The v1 harness accepts any external process that reads one task JSON from stdin 
 python3 build_tasks_reconciled.py
 python3 baselines/always_reproduced.py
 python3 baselines/naive_rerun.py
+python3 baselines/task_type_shortcut.py
 python3 scoring/score.py baselines/predictions_naive_rerun.json --name naive-rerun
 
 python3 harness/run.py \
@@ -108,8 +132,9 @@ leaderboard/ public result presentation
 
 1. Run stronger real agents under the same declared isolation/tool/network budget.
 2. Anchor or withdraw the FAIR external-score receipts in the canonical FAIR project.
-3. Add held-out/private task packs so agents cannot exploit public gold.
-4. Expand the corpus only after the evaluation boundary is stronger.
+3. Add v2 instances whose declared perturbation holds (gold `ROBUST`), closing the task-type tell.
+4. Add held-out/private task packs so agents cannot exploit public gold.
+5. Expand the corpus only after the evaluation boundary is stronger.
 
 ## License
 
