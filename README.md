@@ -51,10 +51,14 @@ The naive-rerun policy recomputes the headline but does not probe the declared p
 In the v1 corpus `task_type == "ROBUST"`, the presence of a `perturbation` block, and
 `gold == FRAGILE` are perfectly aligned (3/3), and the `ROBUST` verdict class is declared but
 never used as gold. The `task-type-shortcut` baseline exploits exactly that: it reads only the
-structural tell, performs no verification at all, and still takes **FRAGILE recall 3/3 and
-FRAGILE F1 1.00** -- the metric on which naive-rerun scores 0/3. Its macro-F1 (0.406) also edges
-out naive-rerun (0.392), so a policy that does no work outscores one that actually recomputes
-the result.
+structural tell, performs no verification at all, and still takes **FRAGILE recall 3/3 (F1 1.00)** --
+a metric on which every other baseline, including the real local agent, scores 0/3. Its verdict
+accuracy (0.571) stays below naive-rerun (0.643). Its macro-F1 (0.406) is nominally above
+naive-rerun's (0.392), but that 0.014 gap on 14 instances is inside noise and is not a ranking.
+
+The finding rests on three instances, so the claim is deliberately narrow: the `ROBUST` class is
+unpopulated in v1 and its task type is a one-to-one tell, which makes FRAGILE recall uninformative
+on this corpus.
 
 Withholding `task_type` would not close this, because the `perturbation` block carries the same
 signal. Closing it properly requires v2 instances whose declared perturbation **holds** (gold

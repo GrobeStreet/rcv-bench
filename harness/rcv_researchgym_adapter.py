@@ -300,22 +300,93 @@ def run_mock(task: dict, rg_task: Path) -> str:
     )
 
 
-def run_rgagent(rg_task: Path, model: str, hours: float, dry_run: bool) -> str:
-    """Real ResearchGym RGAgent backend. Fails loudly on missing prerequisites."""
-    rg_root = os.environ.get("RESEARCHGYM_ROOT")
-    if not rg_root:
+def _latest_run_dir(rg_root: Path):
+    """Newest ResearchGym run directory, i.e. runs/<YYYY-MM-DD>/<run_id>/."""
+    runs = rg_root / "runs"
+    if not runs.is_dir():
+        return None
+    candidates = [p for p in runs.glob("*/*") if p.is_dir()]
+    return max(candidates, key=lambda p: p.stat().st_mtime) if candidates else None
+
+
+def _read_agent_transcript(run_dir: Path) -> str:
+    """Read the PERSISTED agent output.
+
+    ResearchGym redirects the agent process's output into the run directory and
+    persists its transcript there; `run_agent.py` itself prints only
+    orchestration messages, so parsing the CLI's stdout never sees the verdict
+    block.
+
+    Locations are taken from ResearchGym's own `plan.json` (`RG_TRANSCRIPT_PATH`
+    and `RG_LOG_DIR`) rather than guessed, so this keeps working if the upstream
+    layout changes.
+    """
+    candidates = []
+    plan = run_dir / "plan.json"
+    if plan.is_file():
+        try:
+            env = json.loads(plan.read_text(encoding="utf-8"))["agent"]["env"]
+        except (KeyError, json.JSONDecodeError) as exc:
+            raise RuntimeError(f"could not read agent env from {plan}: {exc}") from exc
+        if env.get("RG_TRANSCRIPT_PATH"):
+            candidates.append(Path(env["RG_TRANSCRIPT_PATH"]))
+        if env.get("RG_LOG_DIR"):
+            log_dir = Path(env["RG_LOG_DIR"])
+            candidates += [log_dir / "exec.stdout.log", log_dir / "agent.log"]
+    # Documented fallbacks if plan.json is absent or incomplete.
+    candidates += [
+        run_dir / "transcript.json",
+        run_dir / "agent.log",
+        run_dir / "logs" / "exec.stdout.log",
+    ]
+
+    parts = []
+    seen = set()
+    for f in candidates:
+        if f in seen or not f.is_file():
+            continue
+        seen.add(f)
+        parts.append(f.read_text(encoding="utf-8", errors="replace"))
+    if not parts:
+        looked = ", ".join(str(c) for c in candidates)
+        raise RuntimeError(f"no agent transcript found. looked in: {looked}")
+    return "\n".join(parts)
+
+
+def run_rgagent(
+    rg_task: Path,
+    model: str,
+    hours: float,
+    runtime: str,
+    image: str | None,
+    dry_run: bool,
+):
+    """Real ResearchGym RGAgent backend. Fails loudly on missing prerequisites.
+
+    Returns the persisted agent transcript, or None for a dry run (which is a
+    planning aid and deliberately emits no verdict).
+    """
+    rg_root_env = os.environ.get("RESEARCHGYM_ROOT")
+    if not rg_root_env:
         raise RuntimeError(
             "RESEARCHGYM_ROOT is not set; point it at a ResearchGym checkout"
         )
-    runner = Path(rg_root) / "run_agent.py"
+    rg_root = Path(rg_root_env)
+    runner = rg_root / "run_agent.py"
     if not runner.is_file():
         raise RuntimeError(f"run_agent.py not found under RESEARCHGYM_ROOT={rg_root}")
-    if shutil.which("uv") is None:
+    if runtime == "uv" and shutil.which("uv") is None:
         raise RuntimeError("ResearchGym's uv runtime requires `uv` on PATH")
-    if not any(
+    if runtime == "docker":
+        if shutil.which("docker") is None:
+            raise RuntimeError("--runtime docker requires `docker` on PATH")
+        if not image:
+            raise RuntimeError("--runtime docker requires --image (e.g. researchgym-rg-agent:latest)")
+    if not dry_run and not any(
         os.environ.get(k)
         for k in ("OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GEMINI_API_KEY")
     ):
+        # A dry run plans only and makes no model calls, so it needs no key.
         raise RuntimeError(
             "no provider API key in environment; a live RGAgent run bills real money"
         )
@@ -326,15 +397,26 @@ def run_rgagent(rg_task: Path, model: str, hours: float, dry_run: bool) -> str:
         str(rg_task),
         "rg-agent",
         "--runtime",
-        "uv",
+        runtime,
         "--model",
         model,
         "--basic_hours",
         str(hours),
     ]
+    if runtime == "docker":
+        cmd += ["--image", image]
     if dry_run:
-        log("[rgagent] dry run, would execute: " + " ".join(cmd))
-        return ""
+        # Forward ResearchGym's own planning mode and stop before verdict
+        # extraction: a dry run produces no agent output to parse.
+        cmd.append("--dry_run")
+        log("[rgagent] dry run, plan only: " + " ".join(cmd))
+        proc = subprocess.run(cmd, capture_output=True, text=True, cwd=rg_root)
+        log(proc.stdout.strip() or "(no plan output)")
+        if proc.returncode != 0:
+            raise RuntimeError(
+                f"ResearchGym dry run exited {proc.returncode}: {proc.stderr[-2000:]}"
+            )
+        return None
 
     log("[rgagent] executing: " + " ".join(cmd))
     proc = subprocess.run(cmd, capture_output=True, text=True, cwd=rg_root)
@@ -342,7 +424,12 @@ def run_rgagent(rg_task: Path, model: str, hours: float, dry_run: bool) -> str:
         raise RuntimeError(
             f"ResearchGym run_agent.py exited {proc.returncode}: {proc.stderr[-2000:]}"
         )
-    return proc.stdout
+
+    run_dir = _latest_run_dir(rg_root)
+    if run_dir is None:
+        raise RuntimeError(f"no ResearchGym run directory produced under {rg_root}/runs")
+    log(f"[rgagent] reading persisted transcript from {run_dir}")
+    return _read_agent_transcript(run_dir)
 
 
 # ---------------------------------------------------------------------------
@@ -353,7 +440,21 @@ def main() -> int:
     ap.add_argument("--backend", choices=["mock", "rgagent"], default="mock")
     ap.add_argument("--model", default="openai/gpt-5")
     ap.add_argument("--hours", type=float, default=0.5)
-    ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument(
+        "--runtime",
+        choices=["uv", "docker"],
+        default="uv",
+        help="ResearchGym runtime; publishable runs require docker isolation",
+    )
+    ap.add_argument(
+        "--image", default=None, help="container image, required with --runtime docker"
+    )
+    ap.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="print the ResearchGym plan and exit; standalone only, never through "
+        "harness/run.py, because a dry run emits no verdict by design",
+    )
     ap.add_argument(
         "--work-root",
         default=None,
@@ -366,7 +467,9 @@ def main() -> int:
     if not claim_id:
         raise ValueError("task packet had no claim_id")
 
-    work_root = Path(args.work_root) if args.work_root else Path(tempfile.mkdtemp(prefix="rcv-rg-"))
+    work_root = (
+        Path(args.work_root) if args.work_root else Path(tempfile.mkdtemp(prefix="rcv-rg-"))
+    )
     work_root.mkdir(parents=True, exist_ok=True)
     rg_task = build_rg_task(task, work_root)
     log(f"[adapter] {claim_id}: translated to ResearchGym task at {rg_task}")
@@ -374,7 +477,12 @@ def main() -> int:
     if args.backend == "mock":
         transcript = run_mock(task, rg_task)
     else:
-        transcript = run_rgagent(rg_task, args.model, args.hours, args.dry_run)
+        transcript = run_rgagent(
+            rg_task, args.model, args.hours, args.runtime, args.image, args.dry_run
+        )
+        if transcript is None:
+            log("[adapter] dry run complete; no verdict emitted by design")
+            return 0
 
     verdict = validate_verdict(extract_verdict(transcript), claim_id)
 

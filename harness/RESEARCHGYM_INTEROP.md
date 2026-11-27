@@ -2,42 +2,34 @@
 
 **Date:** 2026-11-26
 **Scope:** can [ResearchGym](https://github.com/Anikethh/ResearchGym) agents be run against RCV-Bench tasks?
-**Context:** ResearchGym maintainer invited an external interoperability test in
-[ResearchGym issue #4](https://github.com/Anikethh/ResearchGym/issues/4) ("Feel free to use or adapt
+**Context:** the ResearchGym maintainer invited an external interoperability test in
+[ResearchGym#4](https://github.com/Anikethh/ResearchGym/issues/4) ("Feel free to use or adapt
 ResearchGym's agents for your benchmark… we'd be interested to hear how it goes, including any
 failures or incompatibilities you find").
 
-**Artifact:** [`harness/rcv_researchgym_adapter.py`](rcv_researchgym_adapter.py) — additive. It changes
-nothing in RCV-Bench's existing code and nothing in ResearchGym; it consumes a ResearchGym checkout
-via `RESEARCHGYM_ROOT`.
+**Artifact:** [`harness/rcv_researchgym_adapter.py`](rcv_researchgym_adapter.py). Additive: it changes
+nothing in RCV-Bench's existing code and nothing in ResearchGym, consuming a ResearchGym checkout via
+`RESEARCHGYM_ROOT`.
 
 ---
 
-## Headline result
+## What was and was not established
 
-**The two frameworks do interoperate, but not directly — a two-way translation layer is required,
-and one of the two directions has no native support on the ResearchGym side.**
-
-The adapter was run through RCV-Bench's own `harness/run.py` across all 14 tasks, offline, at zero
-API cost. All 14 round-tripped cleanly:
-
-`RCV claim packet → ResearchGym task directory → agent transcript → verdict block → validated RCV verdict → scorer`
+**Established.** A translation layer between the two frameworks exists and holds at both ends:
 
 | check | result |
 |---|---|
-| tasks completed through the process contract | **14 / 14** |
-| malformed stdout / schema violations / harness errors | **0** |
-| mean per-task adapter overhead | ~0.03 s |
-| live-agent path (`--backend rgagent`) | reaches the paid-inference boundary and stops |
+| RCV-Bench harness accepts the adapter across the corpus | **14 / 14 tasks**, 0 schema violations |
+| ResearchGym's own `run_agent.py` accepts a translated task and plans a run | **yes** — exit 0, `plan.json` written, RGAgent resolved |
+| adapter overhead per task | ~0.03 s |
 
-**The offline score is not a capability result.** The `mock` backend is a deliberately
-non-inferential protocol-conformance harness. It scored 0.357 verdict accuracy — *exactly* the
-always-REPRODUCED floor (5/14), by construction. It must never be cited as agent performance.
+**Not established.** **No ResearchGym agent was ever executed. Zero model calls were made.** Whether an
+RGAgent can actually verify a research claim is untested here, because execution costs real inference
+money. Everything below concerns plumbing and contracts, not agent capability.
 
-One incidental calibration note: the mock's Brier score (0.233) is better than the naive-rerun
-baseline's (0.266) purely because it states an honest low confidence (0.30) while being wrong.
-That is a property of calibration, not of competence, and it illustrates why RCV-Bench scores
-confidence separately from accuracy.
+The bundled `mock` backend is a protocol-conformance harness. It scored 0.357 verdict accuracy, which
+is *exactly* the always-REPRODUCED floor (5/14) by construction. **It is not a capability result and
+must not be cited as one.**
 
 ---
 
@@ -50,122 +42,107 @@ confidence separately from accuracy.
 | output | a workspace, graded by `grade.sh` → a number | one JSON object: verdict + confidence + localisation + evidence |
 | scoring | improvement over a baseline score | accuracy, macro-F1, per-class recall, localisation, Brier |
 
-These do not compose. Bridging needs two translations, both implemented in the adapter:
+These do not compose. Two translations are required:
 
-1. **`build_rg_task()`** — renders a claim packet as a ResearchGym-shaped task directory: a
-   `task_description.md` that frames verification as the research goal (claim, metric, tolerance,
-   declared perturbation, verdict definitions), a `grading/grade.sh` stub, and the sanitized
-   materials under `input/`.
+1. **`build_rg_task()`** — renders a claim packet as a ResearchGym-shaped task directory.
 2. **`extract_verdict()`** — reduces a free-form agent run back to a verdict. **This is the half
    ResearchGym cannot do natively.** Its agents have an `end_task()` control tool but no structured
-   output contract, so the task description imposes a terminal machine-readable block:
+   output contract, so the task description imposes a terminal block:
 
    ```
    <RCV_VERDICT>{"verdict": "...", "confidence": 0.0-1.0, "localized_cause": "...", ...}</RCV_VERDICT>
    ```
 
-   A run that does not emit this block is unscoreable and counts as an error.
+   A run that does not emit it is unscoreable.
 
 ---
 
-## Incompatibilities found
+## Incompatibilities and operational gotchas
 
-1. **No structured-output contract (blocking without the adapter).** As above: imposed via a
-   terminal verdict block. Any benchmark needing typed output from a ResearchGym agent will hit this.
-2. **`grade.sh` has no meaningful equivalent.** RCV-Bench scores a classification, not a submission
-   artifact. The stub returns `{"score": null}` and the authoritative path stays `scoring/score.py`.
-   ResearchGym's grading pipeline is bypassed entirely.
-3. **Budget and runtime mismatch.** ResearchGym assumes 12–24 h and a **$10 API budget per task**.
-   Across RCV-Bench's 14 tasks that is roughly **$140 and several days** at defaults. RCV-Bench's own
-   first real-agent baseline ran at **≤8 steps per task and $0**. The two budget regimes are not
-   comparable, so a cross-framework score needs the budget declared on both axes.
-4. **Network access breaks the evaluation boundary.** RGAgent ships `web_search()` and
-   `web_browser()`. RCV-Bench gold is **public** (this repo and the Hugging Face dataset), so a
-   web-enabled agent can simply look up the answer. **Any publishable cross-framework score must
-   disable network access and declare it.** This is the most serious integrity issue found.
-5. **Filesystem isolation.** RCV-Bench already warns that the sanitized directory is not a hard
-   boundary. ResearchGym's `uv` runtime executes locally with `bash()`/`python()`, so the agent can
-   reach the parent checkout and read `GOLD/`. Publishable runs need ResearchGym's **Docker** runtime
-   (or a VM) with only the sanitized directory mounted.
-6. **Dependency floor.** ResearchGym needs Python ≥ 3.12 and `uv`; some tasks additionally need
-   Docker and GPUs. RCV-Bench needs only Python 3 + numpy/scipy/pandas/scikit-learn. Verified working
-   here on Python 3.13 with `uv` present — the dependency gap is real but not an obstacle.
+1. **No structured-output contract.** The blocking one, handled by the imposed verdict block.
+2. **`grade.sh` has no equivalent.** RCV-Bench scores a classification, so ResearchGym's grading path
+   is bypassed entirely and the stub returns `{"score": null}`.
+3. **Agent output is not on the CLI's stdout.** `run_agent.py` prints only orchestration messages;
+   the agent transcript is persisted in the run directory. The adapter reads the paths out of
+   ResearchGym's own `plan.json` (`RG_TRANSCRIPT_PATH`, `RG_LOG_DIR`) rather than guessing. An
+   integration that parses `proc.stdout` will record every successful run as an error.
+4. **The checkout must be importable as the package `ResearchGym`.** `run_agent.py` does
+   `from ResearchGym.environment import AgenticEnv`, so a clone in a differently-named directory fails
+   at import. Either `uv sync` it or put the parent directory on `PYTHONPATH` with the checkout named
+   `ResearchGym`.
+5. **Harness timeout must exceed the agent budget.** `harness/run.py` defaults to a 900 s per-task
+   timeout while ResearchGym derives its limit from `--basic_hours`; a 0.5 h agent run needs an
+   explicit `--timeout` above 1860 s or it is killed mid-run and recorded as `agent-error`.
+6. **Budget asymmetry.** `plan.json` confirms `RG_BUDGET_LIMIT=10.0` per task. Across 14 tasks that is
+   roughly **$140** at defaults, against RCV-Bench's existing real-agent baseline at ≤8 steps and $0.
+   Cross-framework numbers need both budgets declared.
+7. **Isolation.** The `uv` runtime executes locally with `bash()`/`python()`, so it can reach the
+   parent checkout and read `GOLD/`. Publishable runs need ResearchGym's **Docker** runtime with only
+   the sanitized directory mounted; the adapter exposes `--runtime docker --image ...` for this.
+8. **Network exposure is conditional, not default.** RGAgent ships `web_search()`/`web_browser()`, and
+   because RCV-Bench gold is public a web-enabled agent could look up the answer. However the planned
+   configuration observed here sets `DISABLE_BROWSER=true`, `USE_EXA_SEARCH=false` and
+   `USE_GOOGLE_WEB_SEARCH=false`, so the default posture is safe. The risk applies only if those are
+   enabled, and the network policy must be declared either way.
 
 ---
 
-## A defect this test surfaced in RCV-Bench itself
-
-Running an external framework against the corpus exposed a **label-leakage channel in RCV-Bench v1**:
+## A leakage issue this test surfaced in RCV-Bench itself
 
 - The sanitized packet exposes `task_type`.
 - **All three `ROBUST`-type tasks have gold `FRAGILE`** (`ds-fragile-01`, `arc-leaderboard-01`,
-  `mmlu-flip-01`).
-- The `ROBUST` verdict class is **declared but never used** by any v1 instance.
-- The tell is **redundant**: `task_type == "ROBUST"` and the presence of a `perturbation`
-  block are perfectly co-extensive, so suppressing one field does not close the channel.
+  `mmlu-flip-01`), and the `ROBUST` verdict class is **declared but never used** as gold in v1.
+- The tell is **redundant**: `task_type == "ROBUST"` and the presence of a `perturbation` block are
+  co-extensive, so suppressing one field does not close the channel.
 
-So an agent can score **3/3 FRAGILE recall** — a headline metric on which the naive-rerun baseline
-scores 0/3 — by mapping `task_type == ROBUST → FRAGILE`, with no verification capability whatsoever.
-`REPRO` is less degenerate but still narrows the space to three classes.
+`baselines/task_type_shortcut.py` quantifies it. The policy reads only the structural tell and
+performs no verification:
 
-### Measured
+| system | verdict acc | macro-F1 | FRAGILE recall |
+|---|---:|---:|---:|
+| always-REPRODUCED | 0.357 | 0.132 | 0/3 |
+| naive-rerun | 0.643 | 0.392 | 0/3 |
+| real agent (qwen2.5-coder:1.5b) | 0.429 | 0.339 | 0/3 |
+| task-type-shortcut | 0.571 | 0.406 | **3/3 (F1 1.00)** |
 
-`baselines/task_type_shortcut.py` was added to quantify it. The policy reads only the structural
-tell and performs no verification whatsoever:
+**The load-bearing result is FRAGILE recall: 3/3 without any verification**, on a metric where every
+other baseline scores 0/3. Read the macro-F1 column with care — 0.406 against naive-rerun's 0.392 is a
+0.014 difference on 14 instances, which is well inside noise and is **not** a ranking. Verdict accuracy
+remains below naive-rerun.
 
-| system | verdict acc | macro-F1 | FRAGILE recall | FABRICATED recall |
-|---|---:|---:|---:|---:|
-| always-REPRODUCED | 0.357 | 0.132 | 0/3 | 0/2 |
-| naive-rerun | 0.643 | 0.392 | 0/3 | 0/2 |
-| real agent (qwen2.5-coder:1.5b) | 0.429 | 0.339 | 0/3 | 1/2 |
-| **task-type-shortcut** | **0.571** | **0.406** | **3/3 (F1 1.00)** | 0/2 |
+The finding also rests on **three instances**, so the accurate statement is narrow: *the `ROBUST` class
+is unpopulated in v1 and its task type is a one-to-one tell, which makes FRAGILE recall uninformative
+on this corpus.*
 
-The shortcut takes **full FRAGILE recall** -- the metric on which both deterministic baselines and
-the real local agent score 0/3 -- and its macro-F1 **exceeds naive-rerun**, a policy that actually
-recomputes the headline. Doing no work outscores doing the work.
-
-**Fix applied now:** the shortcut is published as a floor baseline and documented in the README, so
-the number is on the record rather than available to the first person who notices it. Any FRAGILE
-recall claim on v1 must now beat it.
-
-**Fix still required (v2):** add instances whose declared perturbation *holds*, giving `ROBUST` real
-gold support. Withholding `task_type` is not sufficient, per the redundancy above.
+**Done now:** the shortcut is published as a floor baseline and documented, so the number is on the
+record rather than waiting to be discovered. **Still required (v2):** instances whose declared
+perturbation *holds*, giving `ROBUST` real gold support. No gold was fabricated for this report.
 
 ---
 
 ## Reproducing
 
 ```bash
-# offline, zero cost — proves the full contract
+# offline, zero cost
 python3 harness/run.py \
   --command "python3 $PWD/harness/rcv_researchgym_adapter.py --backend mock --work-root /tmp/rcv-rg-work" \
-  --out predictions_researchgym_mock.json \
-  --trace trace_researchgym_mock.jsonl
-
+  --out predictions_researchgym_mock.json --trace trace_researchgym_mock.jsonl
 python3 scoring/score.py predictions_researchgym_mock.json --name rg-mock-interop
+
+# plan a real run without spending anything (needs no API key)
+export RESEARCHGYM_ROOT=/path/to/ResearchGym      # directory must be named ResearchGym
+export PYTHONPATH=$(dirname "$RESEARCHGYM_ROOT")
+echo "$TASK_PACKET" | python3 harness/rcv_researchgym_adapter.py --backend rgagent --dry-run
 ```
 
-A live ResearchGym run (**bills real money**) additionally needs a ResearchGym checkout, `uv`, and a
-provider key. The adapter checks each prerequisite and raises explicitly rather than degrading:
+A live run additionally needs a provider key and a timeout above the agent budget:
 
 ```bash
-export RESEARCHGYM_ROOT=/path/to/ResearchGym
-export OPENAI_API_KEY=...          # or ANTHROPIC_API_KEY / GEMINI_API_KEY
-python3 harness/run.py \
-  --command "python3 $PWD/harness/rcv_researchgym_adapter.py --backend rgagent --model openai/gpt-5 --hours 0.5" \
+python3 harness/run.py --timeout 2400 \
+  --command "python3 $PWD/harness/rcv_researchgym_adapter.py --backend rgagent \
+             --runtime docker --image researchgym-rg-agent:latest --model openai/gpt-5 --hours 0.5" \
   --out predictions_rgagent.json --trace trace_rgagent.jsonl
 ```
 
-For a publishable number that run must be executed under ResearchGym's Docker runtime with network
-disabled and only the sanitized task directory mounted, and must declare model version, container
-digest, network policy, time/step budget, and tool permissions, per
-[`AGENT_PROTOCOL.md`](AGENT_PROTOCOL.md).
-
----
-
-## Status
-
-- Interoperability: **demonstrated**, offline, 14/14, zero cost.
-- Live agent run: **not performed** — blocked only by paid inference, not by any technical gap.
-- Capability comparison between ResearchGym agents and existing RCV-Bench baselines: **not yet
-  established**, and nothing here should be read as one.
+Per [`AGENT_PROTOCOL.md`](AGENT_PROTOCOL.md), a publishable score must declare model version,
+container digest, network policy, time/step budget and tool permissions.

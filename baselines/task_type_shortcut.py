@@ -16,6 +16,10 @@ This baseline exists so that number is published rather than available. Any
 agent reporting FRAGILE recall on RCV-Bench v1 must beat this floor before the
 result can be read as robustness-checking capability.
 
+Scope: the alignment holds over three instances, and this policy's verdict
+accuracy (0.571) remains below naive-rerun (0.643). The claim is narrow -- that
+FRAGILE recall is uninformative on v1 -- not that this policy is good.
+
 Note that withholding `task_type` alone would not close the channel, since the
 presence of the `perturbation` block carries the same signal. Closing it
 properly requires v2 instances whose declared perturbation HOLDS (gold ROBUST),
