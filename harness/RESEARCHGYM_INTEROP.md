@@ -101,17 +101,35 @@ Running an external framework against the corpus exposed a **label-leakage chann
 - **All three `ROBUST`-type tasks have gold `FRAGILE`** (`ds-fragile-01`, `arc-leaderboard-01`,
   `mmlu-flip-01`).
 - The `ROBUST` verdict class is **declared but never used** by any v1 instance.
+- The tell is **redundant**: `task_type == "ROBUST"` and the presence of a `perturbation`
+  block are perfectly co-extensive, so suppressing one field does not close the channel.
 
 So an agent can score **3/3 FRAGILE recall** — a headline metric on which the naive-rerun baseline
 scores 0/3 — by mapping `task_type == ROBUST → FRAGILE`, with no verification capability whatsoever.
 `REPRO` is less degenerate but still narrows the space to three classes.
 
-**Recommended fix:** add instances whose declared perturbation *holds*, so `ROBUST` is a real gold
-label and the `ROBUST` task type stops being a one-to-one tell. Optionally withhold `task_type` from
-the sanitized packet, or report FRAGILE recall alongside a task-type-blind control.
+### Measured
 
-This matters beyond this experiment: it means the current FRAGILE-recall figures distinguish agents
-only because none of them have exploited the shortcut yet.
+`baselines/task_type_shortcut.py` was added to quantify it. The policy reads only the structural
+tell and performs no verification whatsoever:
+
+| system | verdict acc | macro-F1 | FRAGILE recall | FABRICATED recall |
+|---|---:|---:|---:|---:|
+| always-REPRODUCED | 0.357 | 0.132 | 0/3 | 0/2 |
+| naive-rerun | 0.643 | 0.392 | 0/3 | 0/2 |
+| real agent (qwen2.5-coder:1.5b) | 0.429 | 0.339 | 0/3 | 1/2 |
+| **task-type-shortcut** | **0.571** | **0.406** | **3/3 (F1 1.00)** | 0/2 |
+
+The shortcut takes **full FRAGILE recall** -- the metric on which both deterministic baselines and
+the real local agent score 0/3 -- and its macro-F1 **exceeds naive-rerun**, a policy that actually
+recomputes the headline. Doing no work outscores doing the work.
+
+**Fix applied now:** the shortcut is published as a floor baseline and documented in the README, so
+the number is on the record rather than available to the first person who notices it. Any FRAGILE
+recall claim on v1 must now beat it.
+
+**Fix still required (v2):** add instances whose declared perturbation *holds*, giving `ROBUST` real
+gold support. Withholding `task_type` is not sufficient, per the redundancy above.
 
 ---
 
